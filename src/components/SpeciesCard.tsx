@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { PlantSpecies, SUBCATEGORY_META } from '../types/plants';
+import type { PlantSpecies } from '../types/plants';
+import { SUBCATEGORY_META } from '../types/plants';
 
 interface SpeciesCardProps {
   species: PlantSpecies;

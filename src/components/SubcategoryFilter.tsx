@@ -1,4 +1,5 @@
-import { PlantSubcategory, SUBCATEGORY_META } from '../types/plants';
+import type { PlantSubcategory } from '../types/plants';
+import { SUBCATEGORY_META } from '../types/plants';
 
 interface SubcategoryFilterProps {
   subcategories: PlantSubcategory[];

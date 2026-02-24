@@ -1,4 +1,4 @@
-import { PlantSpecies } from '../types/plants';
+import type { PlantSpecies } from '../types/plants';
 
 export const trees: PlantSpecies[] = [
   // ═══════════════════════════════════════════════════
