@@ -1,4 +1,4 @@
-import { PlantSpecies, PlantCategory, PlantSubcategory } from '../types/plants';
+import type { PlantSpecies, PlantCategory, PlantSubcategory } from '../types/plants';
 import { trees } from './trees';
 
 /** All species from every category */

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { PlantSubcategory, SUBCATEGORY_META } from '../types/plants';
+import type { PlantSubcategory } from '../types/plants';
+import { SUBCATEGORY_META } from '../types/plants';
 import { allSpecies, searchSpecies, uniqueSubcategories } from '../data';
 import SearchBar from '../components/SearchBar';
 import SubcategoryFilter from '../components/SubcategoryFilter';
