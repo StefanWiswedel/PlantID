@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flora Sjælland — Image Curator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f0f0;color:#222;font-size:14px}
+
+/* Layout */
+.top-bar{background:#fff;border-bottom:1px solid #ddd;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.top-bar h1{font-size:16px;font-weight:600}
+.progress{font-size:13px;color:#555}
+.progress strong{color:#2d5a27}
+.main{display:flex;height:calc(100vh - 45px)}
+.sidebar{width:260px;min-width:260px;background:#fff;border-right:1px solid #ddd;overflow-y:auto;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:16px}
+
+/* Sidebar */
+.sp-item{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:13px;transition:background .1s}
+.sp-item:hover{background:#f5f5f5}
+.sp-item.active{background:#e8f0e6;font-weight:600}
+.sp-tick{width:18px;height:18px;border-radius:50%;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:#fff}
+.sp-tick.done{background:#2d5a27;border-color:#2d5a27}
+.sp-info{min-width:0}
+.sp-en{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-la{font-size:11px;color:#888;font-style:italic;font-weight:normal}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.toolbar button,.toolbar label{padding:6px 14px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.toolbar button:hover,.toolbar label:hover{background:#eee}
+.toolbar .primary{background:#2d5a27;color:#fff;border-color:#2d5a27}
+.toolbar .primary:hover{background:#1e4a1a}
+.toolbar .danger{color:#c33}
+.toolbar input[type="file"]{display:none}
+
+/* Status */
+.status{padding:40px;text-align:center;color:#888;font-size:15px}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:#666}
+.loading::after{content:'';display:block;width:28px;height:28px;border:3px solid #ddd;border-top-color:#2d5a27;border-radius:50%;animation:spin .6s linear infinite;margin:12px auto 0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Image grid (available) */
+.cat-section{margin-bottom:20px}
+.cat-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#666;margin-bottom:8px;padding:4px 0;border-bottom:1px solid #e0e0e0}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.thumb{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;cursor:pointer;border:3px solid transparent;transition:border-color .15s,transform .1s;background:#e0e0e0}
+.thumb:hover{transform:scale(1.02)}
+.thumb.selected{border-color:#2d5a27}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-badge{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:50%;background:#2d5a27;color:#fff;font-size:12px;font-weight:700;display:none;align-items:center;justify-content:center}
+.thumb.selected .thumb-badge{display:flex}
+.thumb-src{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:3px 6px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb-err{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:11px;padding:8px;text-align:center}
+
+/* Selected panel */
+.sel-panel{margin-top:20px;background:#fff;border-radius:8px;border:1px solid #ddd;padding:16px}
+.sel-panel h3{font-size:14px;margin-bottom:10px;font-weight:600}
+.sel-empty{color:#999;font-size:13px;padding:12px 0;text-align:center}
+.sel-list{display:flex;flex-direction:column;gap:6px}
+.sel-item{display:flex;align-items:center;gap:10px;padding:8px;background:#fafafa;border:1px solid #eee;border-radius:6px}
+.sel-num{width:26px;height:26px;border-radius:50%;background:#2d5a27;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sel-thumb{width:56px;height:56px;border-radius:4px;overflow:hidden;flex-shrink:0;background:#e0e0e0}
+.sel-thumb img{width:100%;height:100%;object-fit:cover}
+.sel-info{flex:1;min-width:0}
+.sel-url{font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-label-select{padding:4px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px;margin-top:4px}
+.sel-actions{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.sel-actions button{width:28px;height:28px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#555}
+.sel-actions button:hover{background:#eee}
+.sel-actions button.remove{color:#c33}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <h1>Flora Sjælland — Image Curator</h1>
+  <div class="progress"><strong id="prog-count">0</strong> / 20 species curated</div>
+</div>
+<div class="main">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="content" id="content">
+    <div class="status">Select a species from the sidebar to begin curating images.</div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// SPECIES
+// ================================================================
+const SPECIES = [
+  'Fagus sylvatica','Quercus robur','Betula pendula','Fraxinus excelsior',
+  'Tilia cordata','Alnus glutinosa','Populus tremula','Ulmus glabra',
+  'Picea abies','Pinus sylvestris','Larix decidua','Acer platanoides',
+  'Acer pseudoplatanus','Aesculus hippocastanum','Carpinus betulus',
+  'Sorbus aucuparia','Prunus avium','Prunus padus','Salix caprea',
+  'Crataegus monogyna'
+];
+
+const LABELS = ['Whole tree','Bark','Leaves','Flowers','Fruit/Seeds','Buds/Twigs','Autumn','Other'];
+
+const COMMONS = 'https://commons.wikimedia.org/w/api.php';
+
+const SKIP_CAT = /cultivar|illustration|drawing|painting|wood\b|timber|fossil|forest|hedge|seedling|root|garden|avenue|street|purpurea|pendula|asplenifolia|tortuosa|fastigiata|dawyck|zlatia|tricolor|laciniata|disease|pest|gall/i;
+
+const SKIP_FILE = /wood[_ ]|timber|lumber|plank|floor|veneer|board|furniture|fossil|herbarium|microscop|cross[_ -]?section|anatomy|pollen|painting|drawing|illustration|engraving|museum|stamp|coin|logo|icon|map[_ ]|diagram|flag|\.svg/i;
+
+// Map subcategory keywords → label
+const LABEL_MAP = [
+  { label:'Leaves',      kw:/\b(leaf|leaves|leav|foliage|needle|needles)\b/i },
+  { label:'Bark',        kw:/\b(bark|trunk|rind)\b/i },
+  { label:'Flowers',     kw:/\b(flower|flowers|blossom|catkin|infloresc|strobil)\b/i },
+  { label:'Fruit/Seeds', kw:/\b(fruit|fruits|seed|seeds|cone|cones|acorn|nut|berry|berries|haw|samara)\b/i },
+  { label:'Buds/Twigs',  kw:/\b(bud|buds|twig|shoot)\b/i },
+  { label:'Autumn',      kw:/\b(autumn|fall|herbst)\b/i },
+];
+
+function guessLabel(catName) {
+  for (const m of LABEL_MAP) {
+    if (m.kw.test(catName)) return m.label;
+  }
+  return 'Whole tree';
+}
+
+function shortCatName(catTitle, speciesName) {
+  // "Category:Fagus sylvatica (bark)" → "bark"
+  let s = catTitle.replace(/^Category:/i, '').trim();
+  s = s.replace(new RegExp(speciesName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'i'), '').trim();
+  s = s.replace(/^\(|\)$/g, '').replace(/^[-–—_\s]+|[-–—_\s]+$/g, '').trim();
+  return s || 'general';
+}
+
+// ================================================================
+// STATE
+// ================================================================
+let curatedData = {};    // { "Fagus sylvatica": [{url, label}, ...], ... }
+let currentSpecies = null;
+let loadedImages = [];   // [{url, thumbUrl, srcLabel, catName}]
+let selectedImages = []; // [{url, thumbUrl, label}]
+let isLoading = false;
+
+// ================================================================
+// COMMONS API
+// ================================================================
+async function fetchSubcats(name) {
+  const url = COMMONS + '?action=query&list=categorymembers' +
+    '&cmtitle=Category:' + encodeURIComponent(name) +
+    '&cmtype=subcat&cmlimit=50&format=json&origin=*';
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const d = await r.json();
+    if (!d.query || !d.query.categorymembers) return [];
+    return d.query.categorymembers.map(c => c.title);
+  } catch { return []; }
+}
+
+async function fetchCatFiles(catTitle, limit) {
+  const url = COMMONS + '?action=query' +
+    '&generator=categorymembers' +
+    '&gcmtitle=' + encodeURIComponent(catTitle) +
+    '&gcmtype=file&gcmlimit=' + limit +
+    '&prop=imageinfo&iiprop=url&iiurlwidth=400' +
+    '&format=json&origin=*';
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const d = await r.json();
+    if (!d.query || !d.query.pages) return [];
+    return Object.values(d.query.pages)
+      .filter(p => p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl)
+      .filter(p => /\.(jpg|jpeg|png)$/i.test(p.title || ''))
+      .filter(p => !SKIP_FILE.test(p.title || ''))
+      .map(p => ({
+        thumbUrl: p.imageinfo[0].thumburl,
+        fullUrl: p.imageinfo[0].thumburl.replace('/400px-', '/800px-')
+      }));
+  } catch { return []; }
+}
+
+async function loadImagesForSpecies(species) {
+  const name = species.replace(/ /g, '_');
+  const allImages = [];
+  const seen = new Set();
+
+  // Fetch subcategories
+  const subcats = await fetchSubcats(name);
+  const validSubcats = subcats.filter(c => !SKIP_CAT.test(c));
+
+  // Build fetch tasks: parent + subcats
+  const tasks = [];
+
+  // Parent category — up to 50
+  tasks.push({ cat: 'Category:' + name, limit: 50, label: 'general' });
+
+  // Each subcategory — up to 20
+  for (const cat of validSubcats) {
+    const sn = shortCatName(cat, species);
+    tasks.push({ cat, limit: 20, label: sn });
+  }
+
+  // Fetch all in parallel
+  const results = await Promise.all(
+    tasks.map(t => fetchCatFiles(t.cat, t.limit).then(imgs => ({ imgs, label: t.label, cat: t.cat })))
+  );
+
+  for (const r of results) {
+    for (const img of r.imgs) {
+      if (!seen.has(img.thumbUrl)) {
+        seen.add(img.thumbUrl);
+        allImages.push({
+          thumbUrl: img.thumbUrl,
+          url: img.fullUrl,
+          srcLabel: r.label,
+          suggestedLabel: guessLabel(r.cat + ' ' + r.label)
+        });
+      }
+    }
+  }
+
+  return allImages;
+}
+
+// ================================================================
+// SIDEBAR
+// ================================================================
+function renderSidebar() {
+  const el = document.getElementById('sidebar');
+  el.innerHTML = SPECIES.map(sp => {
+    const done = curatedData[sp] && curatedData[sp].length > 0;
+    const active = sp === currentSpecies;
+    return '<div class="sp-item' + (active ? ' active' : '') + '" onclick="selectSpecies(\'' + sp.replace(/'/g, "\\'") + '\')">' +
+      '<div class="sp-tick' + (done ? ' done' : '') + '">' + (done ? '✓' : '') + '</div>' +
+      '<div class="sp-info"><div class="sp-en">' + sp + '</div></div></div>';
+  }).join('');
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = SPECIES.filter(sp => curatedData[sp] && curatedData[sp].length > 0).length;
+  document.getElementById('prog-count').textContent = count;
+}
+
+// ================================================================
+// SPECIES SELECTION
+// ================================================================
+async function selectSpecies(species) {
+  if (isLoading) return;
+  // Save current selection before switching
+  saveCurrentSelection();
+
+  currentSpecies = species;
+  renderSidebar();
+
+  // Restore previous selections for this species
+  selectedImages = [];
+  if (curatedData[species]) {
+    selectedImages = curatedData[species].map(item => ({
+      url: item.url,
+      thumbUrl: item.url.replace('/800px-', '/400px-'),
+      label: item.label
+    }));
+  }
+
+  // Show loading
+  isLoading = true;
+  document.getElementById('content').innerHTML =
+    '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
+    '<div class="loading">Loading images for <strong>' + species + '</strong> from Wikimedia Commons...</div>';
+
+  try {
+    loadedImages = await loadImagesForSpecies(species);
+    isLoading = false;
+    renderContent();
+  } catch (e) {
+    isLoading = false;
+    document.getElementById('content').innerHTML =
+      '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
+      '<div class="status">Error loading images: ' + e.message + '</div>';
+  }
+}
+
+function saveCurrentSelection() {
+  if (!currentSpecies) return;
+  if (selectedImages.length > 0) {
+    curatedData[currentSpecies] = selectedImages.map(img => ({
+      url: img.url,
+      label: img.label
+    }));
+  } else {
+    delete curatedData[currentSpecies];
+  }
+  renderSidebar();
+}
+
+// ================================================================
+// RENDER
+// ================================================================
+function renderToolbarButtons() {
+  return '<button class="primary" onclick="exportJSON()">Export images.json</button>' +
+    '<label>Import images.json<input type="file" accept=".json" onchange="importJSON(event)"></label>' +
+    '<button class="danger" onclick="clearSelection()">Clear selection</button>';
+}
+
+function renderContent() {
+  if (!currentSpecies) {
+    document.getElementById('content').innerHTML = '<div class="status">Select a species from the sidebar.</div>';
+    return;
+  }
+
+  const selectedUrls = new Set(selectedImages.map(s => s.thumbUrl));
+
+  // Group by source label
+  const groups = {};
+  for (const img of loadedImages) {
+    const key = img.srcLabel;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(img);
+  }
+
+  // Sort groups: "general" last, rest alphabetical
+  const groupKeys = Object.keys(groups).sort((a, b) => {
+    if (a === 'general') return 1;
+    if (b === 'general') return -1;
+    return a.localeCompare(b);
+  });
+
+  let gridHTML = '';
+  for (const key of groupKeys) {
+    gridHTML += '<div class="cat-section"><div class="cat-label">' + escHtml(key) +
+      ' (' + groups[key].length + ')</div><div class="img-grid">';
+    for (const img of groups[key]) {
+      const sel = selectedUrls.has(img.thumbUrl);
+      const idx = sel ? selectedImages.findIndex(s => s.thumbUrl === img.thumbUrl) + 1 : 0;
+      gridHTML += '<div class="thumb' + (sel ? ' selected' : '') + '" onclick="toggleImage(this,\'' + escAttr(img.thumbUrl) + '\',\'' + escAttr(img.url) + '\',\'' + escAttr(img.suggestedLabel) + '\')">' +
+        '<img src="' + escAttr(img.thumbUrl) + '" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=thumb-err>Failed</div>\'">' +
+        '<div class="thumb-badge">' + idx + '</div>' +
+        '<div class="thumb-src">' + escHtml(img.srcLabel) + '</div></div>';
+    }
+    gridHTML += '</div></div>';
+  }
+
+  const html = '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
+    (loadedImages.length === 0
+      ? '<div class="status">No images found for ' + currentSpecies + '</div>'
+      : gridHTML) +
+    renderSelectedPanel();
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function renderSelectedPanel() {
+  let html = '<div class="sel-panel"><h3>Selected images (' + selectedImages.length + ')</h3>';
+  if (selectedImages.length === 0) {
+    html += '<div class="sel-empty">Click thumbnails above to select images. Image #1 will be the hero/cover image.</div>';
+  } else {
+    html += '<div class="sel-list">';
+    selectedImages.forEach((img, i) => {
+      html += '<div class="sel-item">' +
+        '<div class="sel-num">' + (i + 1) + '</div>' +
+        '<div class="sel-thumb"><img src="' + escAttr(img.thumbUrl) + '"></div>' +
+        '<div class="sel-info">' +
+        '<select class="sel-label-select" onchange="changeLabel(' + i + ',this.value)">' +
+        LABELS.map(l => '<option value="' + escAttr(l) + '"' + (img.label === l ? ' selected' : '') + '>' + escHtml(l) + '</option>').join('') +
+        '</select>' +
+        '<div class="sel-url">' + escHtml(img.url) + '</div></div>' +
+        '<div class="sel-actions">' +
+        (i > 0 ? '<button onclick="moveImage(' + i + ',-1)" title="Move up">↑</button>' : '<button disabled>↑</button>') +
+        (i < selectedImages.length - 1 ? '<button onclick="moveImage(' + i + ',1)" title="Move down">↓</button>' : '<button disabled>↓</button>') +
+        '<button class="remove" onclick="removeImage(' + i + ')" title="Remove">✕</button>' +
+        '</div></div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ================================================================
+// INTERACTIONS
+// ================================================================
+function toggleImage(el, thumbUrl, fullUrl, suggestedLabel) {
+  const idx = selectedImages.findIndex(s => s.thumbUrl === thumbUrl);
+  if (idx >= 0) {
+    selectedImages.splice(idx, 1);
+  } else {
+    selectedImages.push({ thumbUrl, url: fullUrl, label: suggestedLabel });
+  }
+  saveCurrentSelection();
+  renderContent();
+}
+
+function moveImage(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= selectedImages.length) return;
+  const tmp = selectedImages[idx];
+  selectedImages[idx] = selectedImages[newIdx];
+  selectedImages[newIdx] = tmp;
+  saveCurrentSelection();
+  renderContent();
+}
+
+function removeImage(idx) {
+  selectedImages.splice(idx, 1);
+  saveCurrentSelection();
+  renderContent();
+}
+
+function changeLabel(idx, val) {
+  selectedImages[idx].label = val;
+  saveCurrentSelection();
+}
+
+function clearSelection() {
+  if (selectedImages.length === 0) return;
+  if (!confirm('Clear all selected images for ' + currentSpecies + '?')) return;
+  selectedImages = [];
+  saveCurrentSelection();
+  renderContent();
+}
+
+// ================================================================
+// IMPORT / EXPORT
+// ================================================================
+function exportJSON() {
+  saveCurrentSelection();
+  const out = {};
+  for (const sp of SPECIES) {
+    if (curatedData[sp] && curatedData[sp].length > 0) {
+      out[sp] = curatedData[sp];
+    }
+  }
+  if (Object.keys(out).length === 0) {
+    alert('Nothing to export — no species have curated images yet.');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'images.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid format');
+      // Merge into curatedData
+      for (const [sp, imgs] of Object.entries(data)) {
+        if (SPECIES.includes(sp) && Array.isArray(imgs)) {
+          curatedData[sp] = imgs.map(img => ({
+            url: img.url,
+            label: img.label || 'Other'
+          }));
+        }
+      }
+      // Refresh current view
+      if (currentSpecies && curatedData[currentSpecies]) {
+        selectedImages = curatedData[currentSpecies].map(item => ({
+          url: item.url,
+          thumbUrl: item.url.replace('/800px-', '/400px-'),
+          label: item.label
+        }));
+      }
+      renderSidebar();
+      if (currentSpecies) renderContent();
+      alert('Imported successfully. ' + Object.keys(data).length + ' species loaded.');
+    } catch (err) {
+      alert('Error importing JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ================================================================
+// UTIL
+// ================================================================
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return s.replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ================================================================
+// INIT
+// ================================================================
+renderSidebar();
+</script>
+</body>
+</html>

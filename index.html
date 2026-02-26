@@ -213,6 +213,25 @@ b15:{q:'How are the flowers or fruits arranged?',o:[{t:'Long drooping racemes; b
 let view='browse',filter='all',seen=JSON.parse(localStorage.getItem('fs-seen')||'[]'),imgC={},keyH=[];
 
 // ================================================================
+// CURATED IMAGES — load images.json if available
+// ================================================================
+let curatedImages = null; // null = not loaded yet, {} = loaded (possibly empty)
+
+async function loadCuratedImages() {
+  if (curatedImages !== null) return;
+  try {
+    const r = await fetch('images.json');
+    if (!r.ok) throw new Error('not found');
+    curatedImages = await r.json();
+  } catch {
+    curatedImages = {};
+  }
+}
+
+// Start loading immediately
+const curatedReady = loadCuratedImages();
+
+// ================================================================
 // IMAGE ENGINE — Wikimedia Commons categories
 // ================================================================
 
@@ -268,8 +287,16 @@ async function fetchCatFiles(catTitle, limit) {
 
 async function fetchImgs(la) {
   if (imgC[la]) return imgC[la];
+
+  // Check curated images first
+  await curatedReady;
+  if (curatedImages && curatedImages[la] && curatedImages[la].length > 0) {
+    imgC[la] = curatedImages[la];
+    return imgC[la];
+  }
+
   const name = la.replace(/ /g, '_');
-  
+
   try {
     // Step 1: Discover subcategories
     const subcats = await fetchSubcats(name);
