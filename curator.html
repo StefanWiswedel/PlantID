@@ -409,8 +409,9 @@ function saveCurrentSelection() {
 // RENDER
 // ================================================================
 function renderToolbarButtons() {
-  return '<button class="primary" onclick="exportJSON()">Export images.json</button>' +
-    '<label>Import images.json<input type="file" accept=".json" onchange="importJSON(event)"></label>' +
+  return '<button class="primary" onclick="saveJSON()">Save images.json</button>' +
+    '<button onclick="exportJSON()">Download copy</button>' +
+    '<label>Import<input type="file" accept=".json" onchange="importJSON(event)"></label>' +
     '<button class="danger" onclick="clearSelection()">Clear selection</button>';
 }
 
@@ -532,9 +533,40 @@ function clearSelection() {
 }
 
 // ================================================================
-// IMPORT / EXPORT
+// IMPORT / EXPORT  (File System Access API for direct save)
 // ================================================================
-function exportJSON() {
+let fileHandle = null;  // persisted handle to images.json on disk
+
+// Try to restore a saved file handle from IndexedDB on load
+function openHandleDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('flora-curator', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('handles');
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function saveFileHandle(handle) {
+  try {
+    const db = await openHandleDB();
+    const tx = db.transaction('handles', 'readwrite');
+    tx.objectStore('handles').put(handle, 'images.json');
+  } catch {}
+}
+async function loadFileHandle() {
+  try {
+    const db = await openHandleDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction('handles', 'readonly');
+      const req = tx.objectStore('handles').get('images.json');
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+  } catch { return null; }
+}
+
+// Build the JSON output from curatedData
+function buildExportJSON() {
   saveCurrentSelection();
   const out = {};
   for (const sp of SPECIES) {
@@ -542,16 +574,96 @@ function exportJSON() {
       out[sp] = curatedData[sp];
     }
   }
+  return out;
+}
+
+// Save directly to the file handle (or pick one first time)
+async function saveJSON() {
+  const out = buildExportJSON();
   if (Object.keys(out).length === 0) {
-    alert('Nothing to export — no species have curated images yet.');
+    alert('Nothing to save — no species have curated images yet.');
     return;
   }
-  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const json = JSON.stringify(out, null, 2);
+
+  // If we have no handle yet, try restoring from IndexedDB
+  if (!fileHandle) fileHandle = await loadFileHandle();
+
+  // Re-verify permission on a restored handle
+  if (fileHandle) {
+    try {
+      if (await fileHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
+        if (await fileHandle.requestPermission({ mode: 'readwrite' }) !== 'granted') {
+          fileHandle = null;
+        }
+      }
+    } catch { fileHandle = null; }
+  }
+
+  // If still no handle, ask user to pick the file location
+  if (!fileHandle) {
+    if (typeof window.showSaveFilePicker !== 'function') {
+      // Fallback for Firefox/Safari: classic download
+      downloadJSON(json);
+      return;
+    }
+    try {
+      fileHandle = await window.showSaveFilePicker({
+        suggestedName: 'images.json',
+        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+      });
+      await saveFileHandle(fileHandle);
+    } catch (err) {
+      if (err.name === 'AbortError') return; // user cancelled
+      downloadJSON(json);
+      return;
+    }
+  }
+
+  // Write directly to the file
+  try {
+    const writable = await fileHandle.createWritable();
+    await writable.write(json);
+    await writable.close();
+    showSaveNotice();
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+    fileHandle = null;
+  }
+}
+
+// Fallback download for browsers without File System Access API
+function downloadJSON(json) {
+  const blob = new Blob([json], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'images.json';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+// Brief "Saved!" flash
+function showSaveNotice() {
+  let el = document.getElementById('save-notice');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'save-notice';
+    el.style.cssText = 'position:fixed;top:16px;right:16px;background:#2d5a27;color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s';
+    document.body.appendChild(el);
+  }
+  el.textContent = 'Saved images.json ✓';
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 1800);
+}
+
+// Legacy export (download) — kept as a fallback option
+function exportJSON() {
+  const out = buildExportJSON();
+  if (Object.keys(out).length === 0) {
+    alert('Nothing to export — no species have curated images yet.');
+    return;
+  }
+  downloadJSON(JSON.stringify(out, null, 2));
 }
 
 function importJSON(event) {
