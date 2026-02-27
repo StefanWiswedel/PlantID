@@ -5,132 +5,227 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#111">
+<meta name="theme-color" content="#1a1a1a">
 <title>Flora Sjælland</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..600;1,9..40,300..600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f6f5f0;--sf:#fff;--tx:#111;--tx2:#777;--tx3:#aaa;
-  --ac:#2d5a27;--acl:#eaf2e8;--wm:#c4633f;--wml:#fdf2ee;
+  --bg:#f8f7f4;--sf:#fff;--tx:#1a1a1a;--tx2:#6b6b6b;--tx3:#a0a0a0;
+  --ac:#2d6a4f;--acl:#e8f5e9;--ac2:#40916c;
+  --wm:#c4633f;--wml:#fef0ec;
   --bd:rgba(0,0,0,.06);
   --fs:'Instrument Serif',serif;--fb:'DM Sans',sans-serif;
   --sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px);
-  --th:56px;
+  --th:60px;--rad:14px;
 }
 html{font-size:16px;-webkit-text-size-adjust:100%}
 body{font-family:var(--fb);color:var(--tx);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;overscroll-behavior-y:contain}
 button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;-webkit-tap-highlight-color:transparent}
 img{display:block;max-width:100%}
-#app{min-height:100dvh;padding-bottom:calc(var(--th) + var(--sb))}
-.tabs{position:fixed;bottom:0;left:0;right:0;z-index:900;background:rgba(246,245,240,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--bd);padding-bottom:var(--sb);display:flex;height:calc(var(--th) + var(--sb))}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.62rem;font-weight:500;letter-spacing:.04em;color:var(--tx3);transition:color .15s;padding-top:4px}
+#app{min-height:100dvh;padding-bottom:calc(var(--th) + var(--sb) + 8px)}
+
+/* === TABS === */
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:900;background:rgba(248,247,244,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--bd);padding-bottom:var(--sb);display:flex;height:calc(var(--th) + var(--sb))}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:.62rem;font-weight:500;letter-spacing:.04em;color:var(--tx3);transition:color .15s;padding-top:6px}
 .tab.on{color:var(--ac)}
 .tab svg{width:22px;height:22px;stroke-width:1.7}
 .tab-ic{position:relative}
 .badge{position:absolute;top:-5px;right:-9px;background:var(--wm);color:#fff;font-size:.52rem;font-weight:600;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
-.v{display:none;min-height:100dvh}.v.on{display:block;animation:vIn .2s ease}
-@keyframes vIn{from{opacity:0}to{opacity:1}}
-.bh{padding:calc(var(--st) + 16px) 20px 0}
-.logo{font-family:var(--fs);font-size:1.9rem;letter-spacing:-.02em;line-height:1.1}
+
+/* === VIEWS === */
+.v{display:none;min-height:100dvh}.v.on{display:block;animation:vIn .25s ease}
+@keyframes vIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* === BROWSE === */
+.bh{padding:calc(var(--st) + 20px) 20px 0}
+.logo{font-family:var(--fs);font-size:2rem;letter-spacing:-.02em;line-height:1.1}
 .logo i{font-style:italic;color:var(--ac)}
-.bsub{color:var(--tx2);font-size:.82rem;margin-top:3px;font-weight:300}
-.pills{display:flex;gap:7px;padding:18px 20px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.bsub{color:var(--tx2);font-size:.82rem;margin-top:4px;font-weight:300}
+.pills{display:flex;gap:8px;padding:18px 20px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .pills::-webkit-scrollbar{display:none}
-.pill{flex-shrink:0;padding:7px 14px;border-radius:100px;font-size:.78rem;font-weight:500;background:transparent;color:var(--tx2);border:1.2px solid rgba(0,0,0,.1);transition:all .15s;white-space:nowrap}
+.pill{flex-shrink:0;padding:8px 16px;border-radius:100px;font-size:.78rem;font-weight:500;background:transparent;color:var(--tx2);border:1.5px solid rgba(0,0,0,.08);transition:all .15s;white-space:nowrap}
 .pill.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;padding:0 3px 24px}
-.card{position:relative;overflow:hidden;cursor:pointer;background:var(--sf);-webkit-tap-highlight-color:transparent}
-.card:active{opacity:.92}
-.card-img{aspect-ratio:3/4;background:#e8e6e1;position:relative;overflow:hidden}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 10px 24px}
+.card{position:relative;overflow:hidden;cursor:pointer;background:var(--sf);border-radius:var(--rad);-webkit-tap-highlight-color:transparent;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:transform .15s}
+.card:active{transform:scale(.97)}
+.card-img{aspect-ratio:3/4;background:#e8e6e1;position:relative;overflow:hidden;border-radius:var(--rad) var(--rad) 0 0}
 .card-img img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s}
 .card-img img.ld{opacity:1}
 .skel{position:absolute;inset:0;background:linear-gradient(110deg,#e8e6e1 30%,#f0eee9 50%,#e8e6e1 70%);background-size:200% 100%;animation:shim 1.4s infinite}
 @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.card-txt{padding:9px 10px 11px}
-.card-nm{font-size:.82rem;font-weight:500;line-height:1.2}
-.card-la{font-size:.7rem;color:var(--tx2);font-style:italic;margin-top:1px;font-weight:300}
-.card-ck{position:absolute;top:7px;right:7px;width:24px;height:24px;border-radius:50%;background:var(--wm);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.card-txt{padding:10px 12px 12px}
+.card-nm{font-size:.84rem;font-weight:500;line-height:1.2}
+.card-la{font-size:.72rem;color:var(--tx2);font-style:italic;margin-top:2px;font-weight:300}
+.card-ck{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:var(--wm);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .card-ck svg{width:13px;height:13px;color:#fff;stroke-width:2.5}
+
+/* === DETAIL === */
 .det{position:fixed;inset:0;z-index:950;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;display:none}
-.det.on{display:block;animation:dIn .25s ease}
-@keyframes dIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
-.det-x{position:fixed;top:calc(var(--st) + 10px);left:12px;z-index:960;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center}
-.det-x:active{transform:scale(.9)}
+.det.on{display:block;animation:dIn .3s ease}
+@keyframes dIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+.det-x{position:fixed;top:calc(var(--st) + 12px);left:14px;z-index:960;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.det-x:active{transform:scale(.88)}
 .det-x svg{width:20px;height:20px;color:#fff;stroke-width:2}
 .car{position:relative;width:100%;overflow:hidden}
 .car-t{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .car-t::-webkit-scrollbar{display:none}
 .car-s{flex:0 0 100%;scroll-snap-align:start;aspect-ratio:3/4;background:#e0ddd6;position:relative}
 .car-s img{width:100%;height:100%;object-fit:cover}
-.car-d{display:flex;gap:5px;justify-content:center;padding:10px 0 4px}
-.car-dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);opacity:.3;transition:all .2s}
-.car-dot.on{opacity:1;background:var(--ac);transform:scale(1.2)}
-.car-lbl{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.66rem;font-weight:500;padding:3px 9px;border-radius:100px;text-transform:capitalize;letter-spacing:.02em}
-.car-ct{position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.66rem;font-weight:500;padding:3px 9px;border-radius:100px}
-.det-b{padding:20px 20px 40px}
-.det-g{display:inline-block;font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:100px;margin-bottom:10px}
-.det-en{font-family:var(--fs);font-size:1.8rem;line-height:1.15;letter-spacing:-.01em}
-.det-la{font-size:.95rem;font-style:italic;color:var(--tx2);margin-top:2px;font-weight:300}
-.det-da{font-size:.82rem;color:var(--tx2);margin-top:4px}
-.spot{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px;padding:13px;border-radius:12px;font-size:.84rem;font-weight:500;border:1.5px solid var(--bd);transition:all .2s}
-.spot.on{background:var(--wml);border-color:var(--wm);color:var(--wm)}
-.spot svg{width:18px;height:18px}
-.det-m{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
-.meta{background:var(--sf);border-radius:10px;padding:11px 13px}
+.car-d{display:flex;gap:5px;justify-content:center;padding:12px 0 4px}
+.car-dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);opacity:.25;transition:all .2s}
+.car-dot.on{opacity:1;background:var(--ac);transform:scale(1.3)}
+.car-lbl{position:absolute;bottom:14px;left:14px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.66rem;font-weight:500;padding:4px 10px;border-radius:100px;text-transform:capitalize;letter-spacing:.02em}
+.car-ct{position:absolute;bottom:14px;right:14px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:.66rem;font-weight:500;padding:4px 10px;border-radius:100px}
+.det-b{padding:22px 20px 48px}
+.det-g{display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:5px 12px;border-radius:100px;margin-bottom:12px}
+.det-en{font-family:var(--fs);font-size:1.9rem;line-height:1.15;letter-spacing:-.01em}
+.det-la{font-size:.95rem;font-style:italic;color:var(--tx2);margin-top:3px;font-weight:300}
+.det-da{font-size:.82rem;color:var(--tx2);margin-top:5px}
+
+/* Sighting button */
+.spot-area{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.spot-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:var(--rad);font-size:.85rem;font-weight:500;transition:all .2s}
+.spot-primary{background:var(--ac);color:#fff}
+.spot-primary:active{background:var(--ac2);transform:scale(.98)}
+.spot-count{font-size:.8rem;color:var(--tx2);text-align:center}
+.spot-count strong{color:var(--wm);font-weight:600}
+
+/* Sightings timeline in detail */
+.sight-list{margin-top:12px}
+.sight-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd)}
+.sight-item:last-child{border-bottom:none}
+.sight-icon{width:36px;height:36px;border-radius:10px;background:var(--acl);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ac)}
+.sight-info{flex:1;min-width:0}
+.sight-date{font-size:.82rem;font-weight:500}
+.sight-loc{font-size:.74rem;color:var(--tx2);margin-top:2px}
+.sight-note{font-size:.76rem;color:var(--tx2);margin-top:3px;font-style:italic}
+.sight-del{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--tx3);flex-shrink:0}
+.sight-del:active{background:var(--wml);color:var(--wm)}
+
+.det-m{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.meta{background:var(--sf);border-radius:var(--rad);padding:13px 14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .meta-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:500}
-.meta-v{font-size:.85rem;margin-top:2px;font-weight:500}
-.sect{margin-top:26px}
-.sect-t{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2);font-weight:600;margin-bottom:8px}
-.sect p,.sect li{font-size:.88rem;line-height:1.6;color:#3a3a3a}
+.meta-v{font-size:.86rem;margin-top:3px;font-weight:500}
+.sect{margin-top:28px}
+.sect-t{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2);font-weight:600;margin-bottom:10px}
+.sect p,.sect li{font-size:.88rem;line-height:1.65;color:#3a3a3a}
 .sect ul{list-style:none}
-.sect li{padding:4px 0 4px 14px;position:relative}
-.sect li::before{content:'';position:absolute;left:0;top:12px;width:4px;height:4px;border-radius:50%;background:var(--ac);opacity:.4}
-.conf{background:var(--sf);border-radius:10px;padding:12px 14px;margin-top:6px}
+.sect li{padding:5px 0 5px 16px;position:relative}
+.sect li::before{content:'';position:absolute;left:0;top:13px;width:5px;height:5px;border-radius:50%;background:var(--ac);opacity:.35}
+.conf{background:var(--sf);border-radius:var(--rad);padding:14px 16px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .conf-n{font-weight:500;font-size:.85rem}
-.conf-d{font-size:.82rem;color:var(--tx2);margin-top:3px;line-height:1.5}
-.ih{padding:calc(var(--st) + 16px) 20px 0}
-.it{font-family:var(--fs);font-size:1.6rem}
-.ii{text-align:center;padding:40px 24px}
-.ii p{color:var(--tx2);font-size:.88rem;margin-top:6px;max-width:280px;margin-inline:auto}
-.is{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:13px 26px;border-radius:100px;background:var(--ac);color:#fff;font-size:.88rem;font-weight:500}
+.conf-d{font-size:.82rem;color:var(--tx2);margin-top:4px;line-height:1.55}
+
+/* === IDENTIFY VIEW (TREE) === */
+.ih{padding:calc(var(--st) + 20px) 20px 0}
+.it{font-family:var(--fs);font-size:1.7rem}
+.it-sub{color:var(--tx2);font-size:.82rem;margin-top:4px;font-weight:300}
+.ii{text-align:center;padding:48px 24px}
+.ii p{color:var(--tx2);font-size:.88rem;margin-top:8px;max-width:300px;margin-inline:auto;line-height:1.5}
+.is{display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:14px 28px;border-radius:100px;background:var(--ac);color:#fff;font-size:.88rem;font-weight:500;transition:transform .15s}
 .is:active{transform:scale(.96)}
-.kw{padding:20px}
-.crumbs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px}
-.crumb{font-size:.7rem;padding:4px 10px;border-radius:100px;font-weight:500;background:var(--acl);color:var(--ac);cursor:pointer}
-.crumb:last-child{background:var(--ac);color:#fff}
-.kq{font-family:var(--fs);font-size:1.15rem;line-height:1.35;margin-bottom:16px}
-.ko{display:block;width:100%;text-align:left;padding:14px 16px;border:1.2px solid var(--bd);border-radius:12px;margin-bottom:8px;font-size:.85rem;line-height:1.5;background:var(--sf)}
-.ko:active{border-color:var(--ac);background:var(--acl)}
-.kr{text-align:center;padding:20px}
+
+/* Tree path */
+.tree-wrap{padding:20px 16px 40px}
+.tree-restart{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--tx2);margin-bottom:16px;padding:6px 12px;border-radius:100px;border:1px solid var(--bd)}
+.tree-restart:active{background:var(--acl);color:var(--ac)}
+
+/* Answered steps */
+.tree-step{position:relative;padding-left:32px;padding-bottom:4px;margin-bottom:4px}
+.tree-step::before{content:'';position:absolute;left:9px;top:20px;bottom:-4px;width:2px;background:var(--ac);opacity:.2}
+.tree-step:last-child::before{display:none}
+.tree-step .tree-dot{position:absolute;left:2px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--acl);border:2px solid var(--ac)}
+.tree-step-q{font-size:.76rem;color:var(--tx2);line-height:1.3;margin-bottom:3px}
+.tree-step-a{font-size:.84rem;font-weight:500;color:var(--ac);line-height:1.3;padding:4px 0 8px}
+
+/* Current question */
+.tree-current{position:relative;padding-left:32px;margin-top:4px}
+.tree-current .tree-dot{position:absolute;left:2px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--ac);box-shadow:0 0 0 4px var(--acl)}
+.tree-q{font-family:var(--fs);font-size:1.15rem;line-height:1.35;margin-bottom:14px;color:var(--tx)}
+
+/* Branch options */
+.tree-options{display:flex;flex-direction:column;gap:8px}
+.tree-options.binary{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tree-opt{text-align:left;padding:14px 16px;border:2px solid var(--bd);border-radius:var(--rad);font-size:.84rem;line-height:1.45;background:var(--sf);transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.tree-opt:active{border-color:var(--ac);background:var(--acl);transform:scale(.97)}
+
+/* Result */
+.tree-result{position:relative;padding-left:32px;margin-top:4px}
+.tree-result .tree-dot{position:absolute;left:2px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--wm);box-shadow:0 0 0 4px var(--wml)}
+.kr{text-align:center;padding:8px 0 20px}
 .kr-l{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2);font-weight:600}
-.kr-n{font-family:var(--fs);font-size:1.5rem;margin-top:4px}
+.kr-n{font-family:var(--fs);font-size:1.6rem;margin-top:6px}
 .kr-la{font-style:italic;color:var(--tx2);font-weight:300}
-.kri{width:140px;height:140px;border-radius:50%;margin:18px auto;background:#e0ddd6;overflow:hidden}
+.kri{width:140px;height:140px;border-radius:50%;margin:20px auto;background:#e0ddd6;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1)}
 .kri img{width:100%;height:100%;object-fit:cover}
-.kr-btns{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-.kr-btns button{padding:11px 20px;border-radius:100px;font-size:.84rem;font-weight:500}
-.bp{background:var(--ac);color:#fff}.bs{border:1.2px solid var(--bd);color:var(--tx)}
-.mh{padding:calc(var(--st) + 16px) 20px 0}
+.kr-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.kr-btns button{padding:12px 22px;border-radius:100px;font-size:.84rem;font-weight:500;transition:transform .15s}
+.kr-btns button:active{transform:scale(.96)}
+.bp{background:var(--ac);color:#fff}.bs{border:1.5px solid var(--bd);color:var(--tx)}
+
+/* === FIELD LOG === */
+.mh{padding:calc(var(--st) + 20px) 20px 0}
 .mc{font-family:var(--fs);font-size:2.8rem;color:var(--ac);line-height:1}
-.mc small{font-size:.85rem;color:var(--tx2);font-weight:300;font-family:var(--fb)}
-.pw{margin:14px 20px 4px;height:4px;background:rgba(0,0,0,.06);border-radius:2px;overflow:hidden}
-.pf{height:100%;background:var(--wm);border-radius:2px;transition:width .35s ease}
-.mhn{font-size:.76rem;color:var(--tx2);padding:0 20px;margin-bottom:16px;font-weight:300}
+.mc small{font-size:.88rem;color:var(--tx2);font-weight:300;font-family:var(--fb)}
+.pw{margin:14px 20px 4px;height:5px;background:rgba(0,0,0,.05);border-radius:3px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;transition:width .4s ease}
+.mhn{font-size:.78rem;color:var(--tx2);padding:0 20px;margin-bottom:8px;font-weight:300}
+.log-tabs{display:flex;gap:0;padding:8px 20px 12px}
+.log-tab{flex:1;padding:10px;text-align:center;font-size:.8rem;font-weight:500;color:var(--tx2);border-bottom:2px solid transparent;transition:all .15s}
+.log-tab.on{color:var(--ac);border-bottom-color:var(--ac)}
 .me{text-align:center;padding:48px 24px}
-.me p{color:var(--tx2);font-size:.88rem;margin-top:6px}
-.mr{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer}
+.me p{color:var(--tx2);font-size:.88rem;margin-top:8px;line-height:1.5}
+.mr{display:flex;align-items:center;gap:12px;padding:12px 20px;cursor:pointer;transition:background .1s}
 .mr:active{background:rgba(0,0,0,.03)}
-.mth{width:44px;height:44px;border-radius:10px;background:#e0ddd6;overflow:hidden;flex-shrink:0}
+.mth{width:48px;height:48px;border-radius:12px;background:#e0ddd6;overflow:hidden;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
 .mth img{width:100%;height:100%;object-fit:cover}
 .mi{flex:1;min-width:0}
 .mn{font-size:.86rem;font-weight:500}
 .mla{font-size:.74rem;color:var(--tx2);font-style:italic;font-weight:300}
-.mrm{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--tx3);flex-shrink:0}
+.msub{font-size:.72rem;color:var(--tx3);margin-top:2px}
+.mrm{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--tx3);flex-shrink:0}
 .mrm:active{background:var(--wml);color:var(--wm)}
 .ph{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:.72rem;color:var(--tx3);font-style:italic;text-align:center;padding:8px}
+
+/* Map button in field log */
+.map-all-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 20px 16px;padding:12px;border-radius:var(--rad);border:1.5px solid var(--bd);font-size:.84rem;font-weight:500;color:var(--ac);transition:all .15s}
+.map-all-btn:active{background:var(--acl);transform:scale(.98)}
+
+/* === SIGHTING MODAL === */
+.modal-overlay{position:fixed;inset:0;z-index:970;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.on{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{width:100%;max-width:500px;max-height:92vh;background:var(--bg);border-radius:20px 20px 0 0;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:rgba(0,0,0,.12);margin:10px auto 0}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px}
+.modal-title{font-family:var(--fs);font-size:1.2rem}
+.modal-close{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center}
+.modal-close svg{width:16px;height:16px;stroke-width:2.5}
+.modal-body{padding:0 20px 32px}
+#sight-map{width:100%;height:220px;border-radius:var(--rad);overflow:hidden;margin-bottom:16px;z-index:0}
+.form-row{margin-bottom:14px}
+.form-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--tx2);font-weight:500;margin-bottom:6px;display:block}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:10px;font-family:inherit;font-size:.86rem;background:var(--sf);color:var(--tx);transition:border-color .15s}
+.form-input:focus{outline:none;border-color:var(--ac)}
+.form-save{width:100%;padding:14px;border-radius:var(--rad);background:var(--ac);color:#fff;font-size:.88rem;font-weight:500;margin-top:8px;transition:transform .15s}
+.form-save:active{transform:scale(.98);background:var(--ac2)}
+
+/* Full map modal */
+.map-modal{position:fixed;inset:0;z-index:960;background:var(--bg);display:none}
+.map-modal.on{display:block;animation:vIn .25s ease}
+.map-modal-head{position:absolute;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;gap:12px;padding:calc(var(--st) + 12px) 16px 12px;background:rgba(248,247,244,.92);backdrop-filter:blur(16px)}
+.map-modal-head h2{font-family:var(--fs);font-size:1.2rem;flex:1}
+#full-map{width:100%;height:100%}
+
+/* Leaflet popup overrides */
+.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
+.leaflet-popup-content{font-family:var(--fb);font-size:.82rem;margin:10px 14px}
+.leaflet-popup-content strong{font-weight:600}
 </style>
 </head>
 <body>
@@ -141,11 +236,11 @@ img{display:block;max-width:100%}
     <div class="grid" id="grid"></div>
   </div>
   <div class="v" id="v-identify">
-    <div class="ih"><h1 class="it">Identify</h1></div>
-    <div id="idc"><div class="ii"><p>Answer step-by-step questions to narrow down the species.</p><button class="is" onclick="startKey()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>Begin</button></div></div>
+    <div class="ih"><h1 class="it">Identify</h1><p class="it-sub">Follow the branching key to identify your tree</p></div>
+    <div id="idc"><div class="ii"><p>Answer step-by-step questions to narrow down the species.</p><button class="is" onclick="startKey()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>Begin Identification</button></div></div>
   </div>
-  <div class="v" id="v-mylist">
-    <div class="mh"><div class="logo">My <i>List</i></div></div>
+  <div class="v" id="v-fieldlog">
+    <div class="mh"><div class="logo">Field <i>Log</i></div></div>
     <div id="mlc"></div>
   </div>
 </div>
@@ -153,11 +248,39 @@ img{display:block;max-width:100%}
   <button class="det-x" onclick="closeDet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div id="di"></div>
 </div>
+
+<!-- Sighting modal -->
+<div class="modal-overlay" id="sight-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <h3 class="modal-title">Log Sighting</h3>
+      <button class="modal-close" onclick="closeSightModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="sight-map"></div>
+      <div class="form-row"><label class="form-label">Date & Time</label><input type="datetime-local" class="form-input" id="sight-dt"></div>
+      <div class="form-row"><label class="form-label">Notes (optional)</label><input type="text" class="form-input" id="sight-note" placeholder="e.g. Large specimen near the lake"></div>
+      <button class="form-save" id="sight-save" onclick="saveSighting()">Save Sighting</button>
+    </div>
+  </div>
+</div>
+
+<!-- Full map modal -->
+<div class="map-modal" id="map-modal">
+  <div class="map-modal-head">
+    <button class="det-x" style="position:static;width:36px;height:36px" onclick="closeMapModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <h2>All Sightings</h2>
+  </div>
+  <div id="full-map"></div>
+</div>
+
 <nav class="tabs" id="tabs">
   <button class="tab on" data-v="browse" onclick="go('browse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Browse</button>
-  <button class="tab" data-v="identify" onclick="go('identify')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>Identify</button>
-  <button class="tab" data-v="mylist" onclick="go('mylist')"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge" id="badge" style="display:none">0</span></span>My List</button>
+  <button class="tab" data-v="identify" onclick="go('identify')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v6m0 0l-3-3m3 3l3-3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="15" r="3"/><circle cx="18" cy="15" r="3"/><path d="M12 9v3m0 0l-3.5 1.5M12 12l3.5 1.5" stroke-linecap="round"/></svg>Identify</button>
+  <button class="tab" data-v="fieldlog" onclick="go('fieldlog')"><span class="tab-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span class="badge" id="badge" style="display:none">0</span></span>Field Log</button>
 </nav>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ================================================================
 // SPECIES DATA
@@ -210,32 +333,34 @@ b15:{q:'How are the flowers or fruits arranged?',o:[{t:'Long drooping racemes; b
 // ================================================================
 // STATE
 // ================================================================
-let view='browse',filter='all',seen=JSON.parse(localStorage.getItem('fs-seen')||'[]'),imgC={},keyH=[];
+let view='browse',filter='all',imgC={},keyH=[];
+// Sightings: array of {id, date, lat, lng, note}
+let sightings = JSON.parse(localStorage.getItem('fs-sightings')||'[]');
+// Migrate old format
+const _oldSeen = JSON.parse(localStorage.getItem('fs-seen')||'[]');
+if (_oldSeen.length && !sightings.length) {
+  sightings = _oldSeen.map(id=>({id,date:new Date().toISOString(),lat:null,lng:null,note:'Migrated from checklist'}));
+  localStorage.setItem('fs-sightings',JSON.stringify(sightings));
+}
+function getSeenIds(){ return [...new Set(sightings.map(s=>s.id))]; }
+function getSightingsFor(id){ return sightings.filter(s=>s.id===id); }
+let sightModalSpecies = null;
+let sightMap = null, sightMarker = null, fullMap = null;
 
 // ================================================================
-// CURATED IMAGES — load images.json if available
+// CURATED IMAGES
 // ================================================================
-let curatedImages = null; // null = not loaded yet, {} = loaded (possibly empty)
-
+let curatedImages = null;
 async function loadCuratedImages() {
   if (curatedImages !== null) return;
-  try {
-    const r = await fetch('images.json');
-    if (!r.ok) throw new Error('not found');
-    curatedImages = await r.json();
-  } catch {
-    curatedImages = {};
-  }
+  try { const r = await fetch('images.json'); if (!r.ok) throw 0; curatedImages = await r.json(); }
+  catch { curatedImages = {}; }
 }
-
-// Start loading immediately
 const curatedReady = loadCuratedImages();
 
 // ================================================================
-// IMAGE ENGINE — Wikimedia Commons categories
+// IMAGE ENGINE
 // ================================================================
-
-// Feature types to look for in subcategory names
 const FEAT_MAP = [
   { id:'leaf',   label:'Leaves',        kw: /\b(leaf|leaves|leav|foliage|needle|needles)\b/i },
   { id:'bark',   label:'Bark',          kw: /\b(bark|trunk|rind)\b/i },
@@ -244,200 +369,95 @@ const FEAT_MAP = [
   { id:'bud',    label:'Buds / Twigs',  kw: /\b(bud|buds|twig|shoot)\b/i },
   { id:'autumn', label:'Autumn colour', kw: /\b(autumn|fall|herbst)\b/i },
 ];
-
-// Subcategories to skip entirely (cultivars, wood products, illustrations, fossils, etc.)
 const SKIP_CAT = /cultivar|illustration|drawing|painting|\bwood\b|timber|fossil|forest|hedge|seedling|root|garden|avenue|street|park[^a-z]|country|region|in\s+(the\s+)?\w+$|purpurea|pendula|asplenifolia|tortuosa|fastigiata|dawyck|zlatia|tricolor|laciniata|rotundifolia|atropurpurea|atropunicea|riversii|dissecta|lutescens|columnaris|disease|pest|gall/i;
-
-// Filenames to skip (non-photo content)
 const SKIP_FILE = /wood[_ ]|timber|lumber|plank|floor|veneer|board|furniture|fossil|herbarium|microscop|cross[_ -]?section|anatomy|pollen[_ ]grain|painting|drawing|illustration|engraving|historical[_ ]|museum|stamp|coin|logo|icon|map[_ ]|diagram|flag|svg|cultivation|cultivar|purpurea|pendula|asplenifolia|tortuosa|fastigiata|f\.\s?purpurea/i;
-
 const COMMONS = 'https://commons.wikimedia.org/w/api.php';
 
-// Fetch subcategories of a species category
 async function fetchSubcats(name) {
-  const url = COMMONS + '?action=query&list=categorymembers' +
-    '&cmtitle=Category:' + encodeURIComponent(name) +
-    '&cmtype=subcat&cmlimit=50&format=json&origin=*';
-  const r = await fetch(url);
-  if (!r.ok) return [];
+  const url = COMMONS+'?action=query&list=categorymembers&cmtitle=Category:'+encodeURIComponent(name)+'&cmtype=subcat&cmlimit=50&format=json&origin=*';
+  const r = await fetch(url); if (!r.ok) return [];
   const d = await r.json();
-  if (!d.query || !d.query.categorymembers) return [];
-  return d.query.categorymembers.map(c => c.title);
+  return (d.query&&d.query.categorymembers||[]).map(c=>c.title);
 }
-
-// Fetch image thumbnails from a Commons category
 async function fetchCatFiles(catTitle, limit) {
-  const url = COMMONS + '?action=query' +
-    '&generator=categorymembers' +
-    '&gcmtitle=' + encodeURIComponent(catTitle) +
-    '&gcmtype=file&gcmlimit=' + limit +
-    '&prop=imageinfo&iiprop=url&iiurlwidth=800' +
-    '&format=json&origin=*';
-  const r = await fetch(url);
-  if (!r.ok) return [];
+  const url = COMMONS+'?action=query&generator=categorymembers&gcmtitle='+encodeURIComponent(catTitle)+'&gcmtype=file&gcmlimit='+limit+'&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json&origin=*';
+  const r = await fetch(url); if (!r.ok) return [];
   const d = await r.json();
-  if (!d.query || !d.query.pages) return [];
-  const pages = Object.values(d.query.pages);
-  return pages
-    .filter(p => p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl)
-    .filter(p => /\.(jpg|jpeg|png)$/i.test(p.title || ''))
-    .filter(p => !SKIP_FILE.test(p.title || ''))
-    .map(p => p.imageinfo[0].thumburl);
+  if (!d.query||!d.query.pages) return [];
+  return Object.values(d.query.pages).filter(p=>p.imageinfo&&p.imageinfo[0]&&p.imageinfo[0].thumburl).filter(p=>/\.(jpg|jpeg|png)$/i.test(p.title||'')).filter(p=>!SKIP_FILE.test(p.title||'')).map(p=>p.imageinfo[0].thumburl);
 }
-
 async function fetchImgs(la) {
   if (imgC[la]) return imgC[la];
-
-  // Check curated images first
   await curatedReady;
-  if (curatedImages && curatedImages[la] && curatedImages[la].length > 0) {
-    imgC[la] = curatedImages[la];
-    return imgC[la];
-  }
-
-  const name = la.replace(/ /g, '_');
-
+  if (curatedImages && curatedImages[la] && curatedImages[la].length > 0) { imgC[la]=curatedImages[la]; return imgC[la]; }
+  const name = la.replace(/ /g,'_');
   try {
-    // Step 1: Discover subcategories
     const subcats = await fetchSubcats(name);
-    
-    // Step 2: Match subcats to feature types, skip junk
-    const matched = {}; // featureId → catTitle
-    for (const cat of subcats) {
-      if (SKIP_CAT.test(cat)) continue;
-      for (const feat of FEAT_MAP) {
-        if (feat.kw.test(cat) && !matched[feat.id]) {
-          matched[feat.id] = cat;
-          break;
-        }
-      }
-    }
-    
-    // Step 3: Fetch in parallel — one image per matched subcat + several from parent
-    const tasks = [];
-    const taskLabels = [];
-    
-    // Parent category for whole-tree shots
-    tasks.push(fetchCatFiles('Category:' + name, 20));
-    taskLabels.push('Whole tree');
-    
-    // Matched subcategories — 8 candidates each for better selection
-    for (const [fid, catTitle] of Object.entries(matched)) {
-      const feat = FEAT_MAP.find(f => f.id === fid);
-      tasks.push(fetchCatFiles(catTitle, 8));
-      taskLabels.push(feat ? feat.label : fid);
-    }
-    
+    const matched = {};
+    for (const cat of subcats) { if (SKIP_CAT.test(cat)) continue; for (const feat of FEAT_MAP) { if (feat.kw.test(cat)&&!matched[feat.id]) { matched[feat.id]=cat; break; } } }
+    const tasks = [fetchCatFiles('Category:'+name,20)], taskLabels = ['Whole tree'];
+    for (const [fid,catTitle] of Object.entries(matched)) { const feat=FEAT_MAP.find(f=>f.id===fid); tasks.push(fetchCatFiles(catTitle,8)); taskLabels.push(feat?feat.label:fid); }
     const results = await Promise.all(tasks);
-    
-    // Step 4: Build candidate pool with labels
-    const pool = []; // {url, label}
-    const seen = new Set();
-    
-    // Add subcategory images first (higher priority, pre-labeled)
-    for (let i = 1; i < results.length; i++) {
-      for (const url of results[i]) {
-        if (!seen.has(url)) {
-          seen.add(url);
-          pool.push({ url, label: taskLabels[i] });
-        }
-      }
-    }
-    
-    // Add parent category images (whole tree) — these haven't been categorised
-    // so they're a mix; label as "Whole tree" but filter aggressively
-    for (const url of results[0]) {
-      if (!seen.has(url)) {
-        seen.add(url);
-        pool.push({ url, label: 'Whole tree' });
-      }
-    }
-    
-    if (!pool.length) throw new Error('no images');
-    
-    // Step 5: Select diverse set — at least one per label, cap at 12
-    const selected = [];
-    const usedLabels = new Set();
-    const MAX = 12;
-    
-    // Pass 1: One from each matched feature category (guaranteed diversity)
-    for (const item of pool) {
-      if (selected.length >= MAX) break;
-      if (item.label !== 'Whole tree' && !usedLabels.has(item.label)) {
-        selected.push(item);
-        usedLabels.add(item.label);
-      }
-    }
-    
-    // Pass 2: Second image from each feature category if room
-    const usedUrls = new Set(selected.map(s => s.url));
-    for (const item of pool) {
-      if (selected.length >= MAX) break;
-      if (item.label !== 'Whole tree' && !usedUrls.has(item.url)) {
-        selected.push(item);
-        usedUrls.add(item.url);
-      }
-    }
-    
-    // Pass 3: Fill remaining with whole tree / parent images
-    for (const item of pool) {
-      if (selected.length >= MAX) break;
-      if (!usedUrls.has(item.url)) {
-        selected.push(item);
-        usedUrls.add(item.url);
-      }
-    }
-    
-    // Ensure a whole-tree image is the hero (first position)
-    const htIdx = selected.findIndex(s => s.label === 'Whole tree');
-    if (htIdx > 0) {
-      const [ht] = selected.splice(htIdx, 1);
-      selected.unshift(ht);
-    }
-    
-    imgC[la] = selected;
-    return selected;
-  } catch (e) {
-    // Fallback: Wikipedia pageimages for a single thumbnail
-    try {
-      const t = la.replace(/ /g, '_');
-      const r = await fetch('https://en.wikipedia.org/w/api.php?action=query&titles=' +
-        encodeURIComponent(t) + '&prop=pageimages&format=json&pithumbsize=800&origin=*');
-      const d = await r.json();
-      const p = Object.values(d.query.pages)[0];
-      if (p && p.thumbnail && p.thumbnail.source) {
-        const result = [{url: p.thumbnail.source, label: ''}];
-        imgC[la] = result;
-        return result;
-      }
-    } catch (e2) {}
-    imgC[la] = [];
-    return [];
+    const pool = [], usedUrl = new Set();
+    for (let i=1;i<results.length;i++) for (const url of results[i]) if (!usedUrl.has(url)){usedUrl.add(url);pool.push({url,label:taskLabels[i]});}
+    for (const url of results[0]) if (!usedUrl.has(url)){usedUrl.add(url);pool.push({url,label:'Whole tree'});}
+    if (!pool.length) throw 0;
+    const selected=[],usedLabels=new Set(),MAX=12;
+    for (const item of pool){if(selected.length>=MAX)break;if(item.label!=='Whole tree'&&!usedLabels.has(item.label)){selected.push(item);usedLabels.add(item.label);}}
+    const usedS=new Set(selected.map(s=>s.url));
+    for (const item of pool){if(selected.length>=MAX)break;if(item.label!=='Whole tree'&&!usedS.has(item.url)){selected.push(item);usedS.add(item.url);}}
+    for (const item of pool){if(selected.length>=MAX)break;if(!usedS.has(item.url)){selected.push(item);usedS.add(item.url);}}
+    const htIdx=selected.findIndex(s=>s.label==='Whole tree');
+    if(htIdx>0){const[ht]=selected.splice(htIdx,1);selected.unshift(ht);}
+    imgC[la]=selected; return selected;
+  } catch(e) {
+    try { const t=la.replace(/ /g,'_');const r=await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(t)+'&prop=pageimages&format=json&pithumbsize=800&origin=*');const d=await r.json();const p=Object.values(d.query.pages)[0];if(p&&p.thumbnail&&p.thumbnail.source){const res=[{url:p.thumbnail.source,label:''}];imgC[la]=res;return res;}} catch(e2){}
+    imgC[la]=[]; return [];
   }
 }
-
 function loadCardImg(el, la) {
   fetchImgs(la).then(imgs => {
-    if (!imgs.length) { el.innerHTML = '<div class="ph">' + la + '</div>'; return; }
-    const img = new Image(); img.alt = la;
-    img.onload = () => { el.querySelector('.skel')?.remove(); img.classList.add('ld'); el.appendChild(img); };
-    img.onerror = () => { el.querySelector('.skel')?.remove(); el.innerHTML = '<div class="ph">' + la + '</div>'; };
-    img.src = imgs[0].url;
+    if (!imgs.length) { el.innerHTML='<div class="ph">'+la+'</div>'; return; }
+    const img=new Image();img.alt=la;
+    img.onload=()=>{el.querySelector('.skel')?.remove();img.classList.add('ld');el.appendChild(img);};
+    img.onerror=()=>{el.querySelector('.skel')?.remove();el.innerHTML='<div class="ph">'+la+'</div>';};
+    img.src=imgs[0].url;
   });
 }
 
 // ================================================================
-// NAVIGATION
+// NAVIGATION & HISTORY API
 // ================================================================
-function go(v) {
+function go(v, pushState=true) {
   view = v;
-  document.querySelectorAll('.v').forEach(e => e.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(e => e.classList.remove('on'));
-  document.getElementById('v-' + v).classList.add('on');
-  document.querySelector('.tab[data-v="' + v + '"]')?.classList.add('on');
-  if (v === 'mylist') renderML(); if (v === 'browse') renderGrid();
-  window.scrollTo(0, 0);
+  document.querySelectorAll('.v').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
+  document.getElementById('v-'+v).classList.add('on');
+  document.querySelector('.tab[data-v="'+v+'"]')?.classList.add('on');
+  document.getElementById('tabs').style.display='flex';
+  document.getElementById('det').classList.remove('on');
+  if(v==='fieldlog') renderML();
+  if(v==='browse') renderGrid();
+  window.scrollTo(0,0);
+  if(pushState) history.pushState({view:v},'','#'+v);
 }
+window.addEventListener('popstate', e => {
+  const state = e.state;
+  if (!state) { go('browse',false); return; }
+  if (state.detail) { openDet(state.detail, false); return; }
+  if (state.view) {
+    document.getElementById('det').classList.remove('on');
+    document.getElementById('tabs').style.display='flex';
+    // Close any modals
+    closeSightModal();
+    closeMapModal();
+    go(state.view, false);
+    // Restore key state if identify
+    if(state.view==='identify'&&state.keyH) { keyH=state.keyH; renderK(keyH[keyH.length-1]); }
+    return;
+  }
+  go('browse',false);
+});
 
 // ================================================================
 // BROWSE
@@ -445,128 +465,326 @@ function go(v) {
 function renderPills() {
   document.getElementById('pills').innerHTML =
     '<button class="pill on" onclick="setF(\'all\',this)">All</button>' +
-    GRP.map(g => '<button class="pill" onclick="setF(\'' + g.id + '\',this)">' + g.name + '</button>').join('');
+    GRP.map(g=>'<button class="pill" onclick="setF(\''+g.id+'\',this)">'+g.name+'</button>').join('');
 }
-function setF(f, btn) {
-  filter = f;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-  btn.classList.add('on');
-  renderGrid();
-}
+function setF(f,btn) { filter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));btn.classList.add('on');renderGrid(); }
 function renderGrid() {
-  const el = document.getElementById('grid');
-  const list = filter === 'all' ? SP : SP.filter(s => s.g === filter);
+  const el=document.getElementById('grid'), list=filter==='all'?SP:SP.filter(s=>s.g===filter), seenIds=getSeenIds();
   el.innerHTML = list.map(s => {
-    const ck = seen.includes(s.id);
-    return '<div class="card" onclick="openDet(\'' + s.id + '\')">' +
-      (ck ? '<div class="card-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : '') +
-      '<div class="card-img" id="ci-' + s.id + '"><div class="skel"></div></div>' +
-      '<div class="card-txt"><div class="card-nm">' + s.en + '</div><div class="card-la">' + s.la + '</div></div></div>';
+    const ck=seenIds.includes(s.id);
+    return '<div class="card" onclick="openDet(\''+s.id+'\')">'+
+      (ck?'<div class="card-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>':'')+
+      '<div class="card-img" id="ci-'+s.id+'"><div class="skel"></div></div>'+
+      '<div class="card-txt"><div class="card-nm">'+s.en+'</div><div class="card-la">'+s.la+'</div></div></div>';
   }).join('');
-  list.forEach(s => { const e = document.getElementById('ci-' + s.id); if (e) loadCardImg(e, s.la); });
+  list.forEach(s=>{const e=document.getElementById('ci-'+s.id);if(e) loadCardImg(e,s.la);});
 }
 
 // ================================================================
 // DETAIL
 // ================================================================
-function openDet(id) {
-  const s = SP.find(x => x.id === id); if (!s) return;
-  const g = GRP.find(x => x.id === s.g), ck = seen.includes(s.id);
-  document.getElementById('di').innerHTML =
-    '<div class="car"><div class="car-t" id="ct-' + s.id + '" onscroll="onCS(\'' + s.id + '\')"><div class="car-s"><div class="skel"></div></div></div><div class="car-d" id="cd-' + s.id + '"></div></div>' +
-    '<div class="det-b"><div class="det-g" style="color:' + g.fg + ';background:' + g.bg + '">' + g.name + '</div>' +
-    '<h1 class="det-en">' + s.en + '</h1><p class="det-la">' + s.la + '</p>' +
-    (s.da ? '<p class="det-da">Danish: ' + s.da + '</p>' : '') +
-    '<button class="spot' + (ck ? ' on' : '') + '" onclick="toggleS(\'' + s.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>' + (ck ? 'Spotted ✓' : 'Mark as spotted') + '</button>' +
-    '<div class="det-m"><div class="meta"><div class="meta-l">Height</div><div class="meta-v">' + s.ht + '</div></div><div class="meta"><div class="meta-l">Lifespan</div><div class="meta-v">' + s.life + '</div></div></div>' +
-    '<div class="sect"><h3 class="sect-t">Habitat</h3><p>' + s.hab + '</p></div>' +
-    '<div class="sect"><h3 class="sect-t">Key Identifying Features</h3><ul>' + s.feat.map(f => '<li>' + f + '</li>').join('') + '</ul></div>' +
-    '<div class="sect"><h3 class="sect-t">Seasonal Notes</h3><p>' + s.season + '</p></div>' +
-    (s.conf && s.conf.length ? '<div class="sect"><h3 class="sect-t">Could Be Confused With</h3>' + s.conf.map(c => '<div class="conf"><div class="conf-n">' + c.sp + '</div><div class="conf-d">' + c.d + '</div></div>').join('') + '</div>' : '') +
+function openDet(id, pushState=true) {
+  const s=SP.find(x=>x.id===id);if(!s)return;
+  const g=GRP.find(x=>x.id===s.g), sl=getSightingsFor(s.id), count=sl.length;
+  let h = '<div class="car"><div class="car-t" id="ct-'+s.id+'" onscroll="onCS(\''+s.id+'\')"><div class="car-s"><div class="skel"></div></div></div><div class="car-d" id="cd-'+s.id+'"></div></div>'+
+    '<div class="det-b"><div class="det-g" style="color:'+g.fg+';background:'+g.bg+'">'+g.name+'</div>'+
+    '<h1 class="det-en">'+s.en+'</h1><p class="det-la">'+s.la+'</p>'+
+    (s.da?'<p class="det-da">Danish: '+s.da+'</p>':'')+
+    '<div class="spot-area">'+
+      '<button class="spot-btn spot-primary" onclick="openSightModal(\''+s.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'+(count?'Log Another Sighting':'Log Sighting')+'</button>'+
+      (count?'<div class="spot-count"><strong>'+count+'</strong> sighting'+(count>1?'s':'')+' recorded</div>':'')+
+    '</div>'+
+    '<div class="det-m"><div class="meta"><div class="meta-l">Height</div><div class="meta-v">'+s.ht+'</div></div><div class="meta"><div class="meta-l">Lifespan</div><div class="meta-v">'+s.life+'</div></div></div>';
+
+  // Show sightings if any
+  if(count) {
+    h += '<div class="sect"><h3 class="sect-t">Sightings</h3><div class="sight-list">';
+    sl.sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach((sg,i) => {
+      const d=new Date(sg.date);
+      const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      const locStr=sg.lat?sg.lat.toFixed(4)+'°N, '+sg.lng.toFixed(4)+'°E':'No location';
+      h += '<div class="sight-item">'+
+        '<div class="sight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>'+
+        '<div class="sight-info"><div class="sight-date">'+dateStr+' at '+timeStr+'</div><div class="sight-loc">'+locStr+'</div>'+
+        (sg.note?'<div class="sight-note">'+sg.note+'</div>':'')+
+        '</div>'+
+        '<button class="sight-del" onclick="event.stopPropagation();delSighting(\''+s.id+'\','+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>'+
+        '</div>';
+    });
+    h += '</div></div>';
+  }
+
+  h += '<div class="sect"><h3 class="sect-t">Habitat</h3><p>'+s.hab+'</p></div>'+
+    '<div class="sect"><h3 class="sect-t">Key Identifying Features</h3><ul>'+s.feat.map(f=>'<li>'+f+'</li>').join('')+'</ul></div>'+
+    '<div class="sect"><h3 class="sect-t">Seasonal Notes</h3><p>'+s.season+'</p></div>'+
+    (s.conf&&s.conf.length?'<div class="sect"><h3 class="sect-t">Could Be Confused With</h3>'+s.conf.map(c=>'<div class="conf"><div class="conf-n">'+c.sp+'</div><div class="conf-d">'+c.d+'</div></div>').join('')+'</div>':'')+
     '</div>';
 
+  document.getElementById('di').innerHTML = h;
+
   fetchImgs(s.la).then(imgs => {
-    const tr = document.getElementById('ct-' + s.id);
-    const dots = document.getElementById('cd-' + s.id);
-    if (!imgs.length) { tr.innerHTML = '<div class="car-s"><div class="ph">' + s.la + '</div></div>'; return; }
-    tr.innerHTML = imgs.map((im, i) =>
-      '<div class="car-s"><div class="skel"></div>' +
-      (im.label ? '<div class="car-lbl">' + im.label + '</div>' : '') +
-      '<div class="car-ct">' + (i + 1) + ' / ' + imgs.length + '</div></div>'
-    ).join('');
-    const slides = tr.querySelectorAll('.car-s');
-    imgs.forEach((im, i) => {
-      const img = new Image(); img.alt = s.en + ' — ' + (im.label || '');
-      img.onload = () => { slides[i].querySelector('.skel')?.remove(); slides[i].insertBefore(img, slides[i].firstChild); };
-      img.onerror = () => { slides[i].querySelector('.skel')?.remove(); };
-      img.src = im.url;
-    });
-    if (imgs.length > 1)
-      dots.innerHTML = imgs.map((_, i) => '<div class="car-dot' + (i === 0 ? ' on' : '') + '"></div>').join('');
+    const tr=document.getElementById('ct-'+s.id),dots=document.getElementById('cd-'+s.id);
+    if(!imgs.length){tr.innerHTML='<div class="car-s"><div class="ph">'+s.la+'</div></div>';return;}
+    tr.innerHTML=imgs.map((im,i)=>'<div class="car-s"><div class="skel"></div>'+(im.label?'<div class="car-lbl">'+im.label+'</div>':'')+'<div class="car-ct">'+(i+1)+' / '+imgs.length+'</div></div>').join('');
+    const slides=tr.querySelectorAll('.car-s');
+    imgs.forEach((im,i)=>{const img=new Image();img.alt=s.en+' — '+(im.label||'');img.onload=()=>{slides[i].querySelector('.skel')?.remove();slides[i].insertBefore(img,slides[i].firstChild);};img.onerror=()=>{slides[i].querySelector('.skel')?.remove();};img.src=im.url;});
+    if(imgs.length>1) dots.innerHTML=imgs.map((_,i)=>'<div class="car-dot'+(i===0?' on':'')+'"></div>').join('');
   });
 
   document.getElementById('det').classList.add('on');
-  document.getElementById('det').scrollTop = 0;
-  document.getElementById('tabs').style.display = 'none';
+  document.getElementById('det').scrollTop=0;
+  document.getElementById('tabs').style.display='none';
+  if(pushState) history.pushState({detail:id},'','#detail/'+id);
 }
 function onCS(id) {
-  const tr = document.getElementById('ct-' + id); if (!tr) return;
-  const idx = Math.round(tr.scrollLeft / tr.offsetWidth);
-  document.querySelectorAll('#cd-' + id + ' .car-dot').forEach((d, i) => d.classList.toggle('on', i === idx));
+  const tr=document.getElementById('ct-'+id);if(!tr)return;
+  const idx=Math.round(tr.scrollLeft/tr.offsetWidth);
+  document.querySelectorAll('#cd-'+id+' .car-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
 }
 function closeDet() {
   document.getElementById('det').classList.remove('on');
-  document.getElementById('tabs').style.display = 'flex';
-  if (view === 'browse') renderGrid(); if (view === 'mylist') renderML();
+  document.getElementById('tabs').style.display='flex';
+  if(view==='browse') renderGrid();
+  if(view==='fieldlog') renderML();
+  history.back();
 }
 
 // ================================================================
-// SEEN
+// SIGHTINGS
 // ================================================================
-function toggleS(id) {
-  if (seen.includes(id)) seen = seen.filter(x => x !== id); else seen.push(id);
-  localStorage.setItem('fs-seen', JSON.stringify(seen)); updB(); openDet(id);
+function openSightModal(id) {
+  sightModalSpecies = id;
+  const modal = document.getElementById('sight-modal');
+  modal.classList.add('on');
+  // Set current date/time
+  const now = new Date();
+  const dt = document.getElementById('sight-dt');
+  dt.value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'T'+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('sight-note').value = '';
+  history.pushState({view:view,modal:'sight'},'','#sighting');
+  // Init map after modal is visible
+  setTimeout(()=>{
+    if(sightMap){sightMap.remove();sightMap=null;}
+    const mapEl = document.getElementById('sight-map');
+    sightMap = L.map(mapEl,{zoomControl:false}).setView([55.676,12.568],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(sightMap);
+    L.control.zoom({position:'topright'}).addTo(sightMap);
+    sightMarker = L.marker([55.676,12.568],{draggable:true}).addTo(sightMap);
+    // Try GPS
+    if(navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos=>{
+        const ll=[pos.coords.latitude,pos.coords.longitude];
+        sightMap.setView(ll,15);
+        sightMarker.setLatLng(ll);
+      },()=>{},{enableHighAccuracy:true,timeout:8000});
+    }
+    sightMap.invalidateSize();
+  },350);
+}
+function closeSightModal() {
+  document.getElementById('sight-modal').classList.remove('on');
+  if(sightMap){sightMap.remove();sightMap=null;}
+  sightModalSpecies = null;
+}
+function saveSighting() {
+  if(!sightModalSpecies) return;
+  const dt = document.getElementById('sight-dt').value;
+  const note = document.getElementById('sight-note').value.trim();
+  const ll = sightMarker ? sightMarker.getLatLng() : null;
+  sightings.push({
+    id: sightModalSpecies,
+    date: dt ? new Date(dt).toISOString() : new Date().toISOString(),
+    lat: ll ? ll.lat : null,
+    lng: ll ? ll.lng : null,
+    note: note
+  });
+  localStorage.setItem('fs-sightings', JSON.stringify(sightings));
+  closeSightModal();
+  updB();
+  // Re-open detail to show updated sightings
+  openDet(sightModalSpecies || sightings[sightings.length-1].id, false);
+}
+function delSighting(speciesId, sortedIdx) {
+  // Get sightings for species sorted by date desc (same order as display)
+  const sl = getSightingsFor(speciesId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const target = sl[sortedIdx];
+  if(!target) return;
+  // Find and remove from main array
+  const mainIdx = sightings.indexOf(target);
+  if(mainIdx>-1) sightings.splice(mainIdx,1);
+  localStorage.setItem('fs-sightings',JSON.stringify(sightings));
+  updB();
+  openDet(speciesId, false);
 }
 function updB() {
-  const b = document.getElementById('badge');
-  if (seen.length > 0) { b.textContent = seen.length; b.style.display = 'flex'; }
-  else b.style.display = 'none';
+  const b=document.getElementById('badge'),n=getSeenIds().length;
+  if(n>0){b.textContent=n;b.style.display='flex';}else b.style.display='none';
 }
 
 // ================================================================
-// MY LIST
+// FIELD LOG
 // ================================================================
 function renderML() {
-  const el = document.getElementById('mlc'), n = seen.length, pct = (n / SP.length * 100).toFixed(0);
-  let h = '<div style="padding:8px 20px 0"><div class="mc">' + n + '<small> / ' + SP.length + ' seen</small></div></div><div class="pw"><div class="pf" style="width:' + pct + '%"></div></div><p class="mhn">' + (n === 0 ? 'Tap ✓ on any species to start.' : n === SP.length ? "You've spotted them all!" : (SP.length - n) + ' more to find.') + '</p>';
-  if (!n) h += '<div class="me"><p>Nothing here yet.</p></div>';
-  else seen.forEach(id => {
-    const s = SP.find(x => x.id === id); if (!s) return;
-    h += '<div class="mr" onclick="openDet(\'' + s.id + '\')"><div class="mth" id="mt-' + s.id + '"><div class="skel" style="width:100%;height:100%"></div></div><div class="mi"><div class="mn">' + s.en + '</div><div class="mla">' + s.la + '</div></div><button class="mrm" onclick="event.stopPropagation();rmS(\'' + s.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>';
-  });
+  const el=document.getElementById('mlc'),seenIds=getSeenIds(),n=seenIds.length,pct=(n/SP.length*100).toFixed(0);
+  let h = '<div style="padding:8px 20px 0"><div class="mc">'+n+'<small> / '+SP.length+' species spotted</small></div></div><div class="pw"><div class="pf" style="width:'+pct+'%"></div></div><p class="mhn">'+(n===0?'Log your first sighting to start tracking.':n===SP.length?"You've spotted them all!":(SP.length-n)+' more to find.')+'</p>';
+  if(sightings.length && sightings.some(s=>s.lat)) {
+    h += '<button class="map-all-btn" onclick="openMapModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>View All on Map</button>';
+  }
+  if(!n) {
+    h += '<div class="me"><p>Head outside and log your first tree sighting!</p></div>';
+  } else {
+    // Group by species, sort by most recent sighting
+    const speciesOrder = seenIds.map(id=>{
+      const sl=getSightingsFor(id);
+      const latest=sl.sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+      return {id,count:sl.length,latest};
+    }).sort((a,b)=>new Date(b.latest.date)-new Date(a.latest.date));
+    speciesOrder.forEach(({id,count,latest})=>{
+      const s=SP.find(x=>x.id===id);if(!s)return;
+      const d=new Date(latest.date);
+      const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      h += '<div class="mr" onclick="openDet(\''+s.id+'\')">'+
+        '<div class="mth" id="mt-'+s.id+'"><div class="skel" style="width:100%;height:100%"></div></div>'+
+        '<div class="mi"><div class="mn">'+s.en+'</div><div class="mla">'+s.la+'</div>'+
+        '<div class="msub">'+count+' sighting'+(count>1?'s':'')+' · Last: '+dateStr+'</div></div>'+
+        '<button class="mrm" onclick="event.stopPropagation();rmSpecies(\''+s.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>';
+    });
+  }
   el.innerHTML = h;
-  seen.forEach(id => { const s = SP.find(x => x.id === id); if (!s) return; const e = document.getElementById('mt-' + s.id); if (e) loadCardImg(e, s.la); });
+  seenIds.forEach(id=>{const s=SP.find(x=>x.id===id);if(!s)return;const e=document.getElementById('mt-'+s.id);if(e)loadCardImg(e,s.la);});
 }
-function rmS(id) { seen = seen.filter(x => x !== id); localStorage.setItem('fs-seen', JSON.stringify(seen)); updB(); renderML(); }
+function rmSpecies(id) {
+  sightings = sightings.filter(s=>s.id!==id);
+  localStorage.setItem('fs-sightings',JSON.stringify(sightings));
+  updB(); renderML();
+}
 
 // ================================================================
-// IDENTIFY
+// FULL MAP MODAL
 // ================================================================
-function startKey() { keyH = ['start']; renderK('start'); }
-function renderK(step) {
-  const el = document.getElementById('idc'), k = KEY[step]; if (!k) return;
-  let bc = keyH.map((h, i) => '<button class="crumb" onclick="keyTo(' + i + ')">' + (i === 0 ? 'Start' : 'Step ' + i) + '</button>').join('');
-  let html = '<div class="kw"><div class="crumbs">' + bc + '</div><p class="kq">' + k.q + '</p>';
-  k.o.forEach(o => { html += o.r ? '<button class="ko" onclick="keyR(\'' + o.r + '\')">' + o.t + '</button>' : '<button class="ko" onclick="keyA(\'' + o.n + '\')">' + o.t + '</button>'; });
-  el.innerHTML = html + '</div>';
+function openMapModal() {
+  document.getElementById('map-modal').classList.add('on');
+  document.getElementById('tabs').style.display='none';
+  history.pushState({view:view,modal:'map'},'','#map');
+  setTimeout(()=>{
+    if(fullMap){fullMap.remove();fullMap=null;}
+    fullMap=L.map('full-map',{zoomControl:false}).setView([55.676,12.568],11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(fullMap);
+    L.control.zoom({position:'topright'}).addTo(fullMap);
+    const bounds=[];
+    sightings.forEach(sg=>{
+      if(!sg.lat) return;
+      const s=SP.find(x=>x.id===sg.id);
+      const d=new Date(sg.date);
+      const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      const m=L.marker([sg.lat,sg.lng]).addTo(fullMap);
+      m.bindPopup('<strong>'+(s?s.en:sg.id)+'</strong><br>'+dateStr+(sg.note?'<br><em>'+sg.note+'</em>':''));
+      bounds.push([sg.lat,sg.lng]);
+    });
+    if(bounds.length) fullMap.fitBounds(bounds,{padding:[50,50],maxZoom:14});
+    fullMap.invalidateSize();
+  },300);
 }
-function keyA(n) { keyH.push(n); renderK(n); window.scrollTo(0, 0); }
-function keyTo(i) { keyH = keyH.slice(0, i + 1); renderK(keyH[keyH.length - 1]); }
-function keyR(id) {
-  const s = SP.find(x => x.id === id); if (!s) return;
+function closeMapModal() {
+  document.getElementById('map-modal').classList.remove('on');
+  document.getElementById('tabs').style.display='flex';
+  if(fullMap){fullMap.remove();fullMap=null;}
+}
+
+// ================================================================
+// IDENTIFY — Visual Decision Tree
+// ================================================================
+function startKey() {
+  keyH = [{step:'start',answer:null}];
+  renderTree();
+  history.pushState({view:'identify',keyH:keyH.map(k=>k.step)},'','#identify/start');
+}
+
+function renderTree() {
   const el = document.getElementById('idc');
-  let bc = keyH.map((h, i) => '<button class="crumb" onclick="keyTo(' + i + ')">' + (i === 0 ? 'Start' : 'Step ' + i) + '</button>').join('') + '<span class="crumb">Result</span>';
-  el.innerHTML = '<div class="kw"><div class="crumbs">' + bc + '</div><div class="kr"><p class="kr-l">Your tree is likely</p><h2 class="kr-n">' + s.en + '</h2><p class="kr-la">' + s.la + '</p><div class="kri" id="kri"><div class="skel" style="width:100%;height:100%;border-radius:50%"></div></div><div class="kr-btns"><button class="bp" onclick="openDet(\'' + s.id + '\')">View profile</button><button class="bs" onclick="startKey()">Start over</button></div></div></div>';
+  const current = keyH[keyH.length-1];
+  const k = KEY[current.step];
+  if (!k) return;
+
+  let html = '<div class="tree-wrap">';
+  html += '<button class="tree-restart" onclick="go(\'identify\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2"><path d="M1 4v6h6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 105.64-9.14L1 10" stroke-linecap="round" stroke-linejoin="round"/></svg>Start Over</button>';
+
+  // Render answered steps
+  for (let i = 0; i < keyH.length - 1; i++) {
+    const step = keyH[i];
+    const kk = KEY[step.step];
+    if (!kk) continue;
+    html += '<div class="tree-step">';
+    html += '<div class="tree-dot"></div>';
+    html += '<div class="tree-step-q">' + kk.q + '</div>';
+    html += '<div class="tree-step-a">' + step.answer + '</div>';
+    html += '</div>';
+  }
+
+  // Render current question with branch options
+  html += '<div class="tree-current">';
+  html += '<div class="tree-dot"></div>';
+  html += '<div class="tree-q">' + k.q + '</div>';
+
+  const optCount = k.o.length;
+  html += '<div class="tree-options' + (optCount === 2 ? ' binary' : '') + '">';
+  k.o.forEach(o => {
+    if (o.r) {
+      html += '<button class="tree-opt" onclick="keyResult(\'' + o.r + '\',\'' + esc(o.t) + '\')">' + o.t + '</button>';
+    } else {
+      html += '<button class="tree-opt" onclick="keyAnswer(\'' + o.n + '\',\'' + esc(o.t) + '\')">' + o.t + '</button>';
+    }
+  });
+  html += '</div></div></div>';
+
+  el.innerHTML = html;
+  // Scroll to current question
+  setTimeout(() => {
+    const cur = el.querySelector('.tree-current');
+    if (cur) cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function esc(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+function keyAnswer(nextStep, answerText) {
+  keyH[keyH.length-1].answer = answerText;
+  keyH.push({step: nextStep, answer: null});
+  renderTree();
+  history.pushState({view:'identify',keyH:keyH.map(k=>k.step)},'','#identify/'+nextStep);
+}
+
+function keyResult(speciesId, answerText) {
+  keyH[keyH.length-1].answer = answerText;
+  const s = SP.find(x => x.id === speciesId);
+  if (!s) return;
+  const el = document.getElementById('idc');
+
+  let html = '<div class="tree-wrap">';
+  html += '<button class="tree-restart" onclick="go(\'identify\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2"><path d="M1 4v6h6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 105.64-9.14L1 10" stroke-linecap="round" stroke-linejoin="round"/></svg>Start Over</button>';
+
+  // All answered steps
+  for (let i = 0; i < keyH.length; i++) {
+    const step = keyH[i];
+    const kk = KEY[step.step];
+    if (!kk) continue;
+    html += '<div class="tree-step">';
+    html += '<div class="tree-dot"></div>';
+    html += '<div class="tree-step-q">' + kk.q + '</div>';
+    html += '<div class="tree-step-a">' + (step.answer||'') + '</div>';
+    html += '</div>';
+  }
+
+  // Result
+  html += '<div class="tree-result"><div class="tree-dot"></div>';
+  html += '<div class="kr"><p class="kr-l">Your tree is likely</p><h2 class="kr-n">' + s.en + '</h2><p class="kr-la">' + s.la + '</p>';
+  html += '<div class="kri" id="kri"><div class="skel" style="width:100%;height:100%;border-radius:50%"></div></div>';
+  html += '<div class="kr-btns"><button class="bp" onclick="openDet(\'' + s.id + '\')">View Profile</button><button class="bs" onclick="startKey()">Try Again</button></div>';
+  html += '</div></div></div>';
+
+  el.innerHTML = html;
+
   fetchImgs(s.la).then(imgs => {
     const e = document.getElementById('kri');
     if (!imgs.length) { e.innerHTML = '<div class="ph">' + s.la + '</div>'; return; }
@@ -575,15 +793,31 @@ function keyR(id) {
     img.onerror = () => { e.innerHTML = '<div class="ph">' + s.la + '</div>'; };
     img.src = imgs[0].url;
   });
+
+  // Scroll to result
+  setTimeout(() => {
+    const res = el.querySelector('.tree-result');
+    if (res) res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+// Back navigation in tree
+function renderK(step) {
+  // Rebuild keyH to match step
+  const idx = keyH.findIndex(k=>k.step===step);
+  if(idx>=0) { keyH=keyH.slice(0,idx+1); keyH[keyH.length-1].answer=null; }
+  renderTree();
 }
 
 // ================================================================
 // INIT
 // ================================================================
 renderPills(); renderGrid(); updB();
+// Set initial history state
+history.replaceState({view:'browse'},'','#browse');
 
 if ('serviceWorker' in navigator) {
-  const sw = "const C='flora-v4';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}return r;}).catch(()=>c);return c||f;}));});";
+  const sw = "const C='flora-v5';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.open(C).then(c=>caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))).then(()=>clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}return r;}).catch(()=>c);return c||f;}));});";
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], {type: 'application/javascript'}))).catch(() => {});
 }
 </script>
