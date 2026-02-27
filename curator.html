@@ -29,12 +29,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 /* Toolbar */
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
-.toolbar button,.toolbar label{padding:6px 14px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
-.toolbar button:hover,.toolbar label:hover{background:#eee}
+.toolbar button{padding:6px 14px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.toolbar button:hover:not(:disabled){background:#eee}
+.toolbar button:disabled{opacity:.5;cursor:default}
 .toolbar .primary{background:#2d5a27;color:#fff;border-color:#2d5a27}
-.toolbar .primary:hover{background:#1e4a1a}
+.toolbar .primary:hover:not(:disabled){background:#1e4a1a}
 .toolbar .danger{color:#c33}
-.toolbar input[type="file"]{display:none}
 
 /* Status */
 .status{padding:40px;text-align:center;color:#888;font-size:15px}
@@ -89,7 +89,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   .content{padding:12px}
   .img-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
   .toolbar{gap:6px}
-  .toolbar button,.toolbar label{padding:5px 10px;font-size:12px}
+  .toolbar button{padding:5px 10px;font-size:12px}
   .sel-item{flex-wrap:wrap;gap:8px}
   .sel-thumb{width:44px;height:44px}
   .sel-actions{flex-direction:row}
@@ -101,7 +101,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="top-bar">
   <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</a>
   <h1>Image Curator</h1>
-  <div class="progress"><strong id="prog-count">0</strong> / 20 curated</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div id="gh-status" style="font-size:12px"></div>
+    <button onclick="showTokenPrompt()" style="background:none;border:1px solid #ccc;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:18px" title="GitHub token">&#128273;</button>
+    <div class="progress"><strong id="prog-count">0</strong> / 20 curated</div>
+  </div>
 </div>
 <div class="main">
   <div class="sidebar" id="sidebar"></div>
@@ -228,18 +232,26 @@ function shortCatName(catTitle, speciesName) {
 }
 
 // ================================================================
-// STATE — auto-persisted to localStorage
+// GITHUB CONFIG
+// ================================================================
+const GH_OWNER = 'StefanWiswedel';
+const GH_REPO  = 'PlantID';
+const GH_BRANCH = 'main';
+const GH_FILE  = 'images.json';
+const GH_API   = 'https://api.github.com';
+
+let ghToken = localStorage.getItem('gh-token') || '';
+let ghFileSha = null;  // SHA of the current images.json (needed for updates)
+
+// ================================================================
+// STATE
 // ================================================================
 let curatedData = {};    // { "Fagus sylvatica": [{url, label}, ...], ... }
-try { const saved = localStorage.getItem('flora-curated'); if (saved) curatedData = JSON.parse(saved); } catch {}
 let currentSpecies = null;
 let loadedImages = [];   // [{url, thumbUrl, srcLabel, catName}]
 let selectedImages = []; // [{url, thumbUrl, label}]
 let isLoading = false;
-
-function persistCurated() {
-  try { localStorage.setItem('flora-curated', JSON.stringify(curatedData)); } catch {}
-}
+let isSaving = false;
 
 // ================================================================
 // COMMONS API
@@ -401,7 +413,6 @@ function saveCurrentSelection() {
   } else {
     delete curatedData[currentSpecies];
   }
-  persistCurated();
   renderSidebar();
 }
 
@@ -409,9 +420,7 @@ function saveCurrentSelection() {
 // RENDER
 // ================================================================
 function renderToolbarButtons() {
-  return '<button class="primary" onclick="saveJSON()">Save images.json</button>' +
-    '<button onclick="exportJSON()">Download copy</button>' +
-    '<label>Import<input type="file" accept=".json" onchange="importJSON(event)"></label>' +
+  return '<button class="primary" onclick="saveToGitHub()"' + (isSaving ? ' disabled' : '') + '>Save to repo</button>' +
     '<button class="danger" onclick="clearSelection()">Clear selection</button>';
 }
 
@@ -533,40 +542,47 @@ function clearSelection() {
 }
 
 // ================================================================
-// IMPORT / EXPORT  (File System Access API for direct save)
+// GITHUB API — load & save images.json directly on the repo
 // ================================================================
-let fileHandle = null;  // persisted handle to images.json on disk
-
-// Try to restore a saved file handle from IndexedDB on load
-function openHandleDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open('flora-curator', 1);
-    req.onupgradeneeded = () => req.result.createObjectStore('handles');
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-async function saveFileHandle(handle) {
-  try {
-    const db = await openHandleDB();
-    const tx = db.transaction('handles', 'readwrite');
-    tx.objectStore('handles').put(handle, 'images.json');
-  } catch {}
-}
-async function loadFileHandle() {
-  try {
-    const db = await openHandleDB();
-    return await new Promise((resolve, reject) => {
-      const tx = db.transaction('handles', 'readonly');
-      const req = tx.objectStore('handles').get('images.json');
-      req.onsuccess = () => resolve(req.result || null);
-      req.onerror = () => resolve(null);
-    });
-  } catch { return null; }
+function ghHeaders() {
+  return {
+    'Accept': 'application/vnd.github.v3+json',
+    'Authorization': 'token ' + ghToken
+  };
 }
 
-// Build the JSON output from curatedData
-function buildExportJSON() {
+async function loadFromGitHub() {
+  if (!ghToken) return;
+  updateGHStatus('loading');
+  try {
+    const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE + '?ref=' + GH_BRANCH;
+    const r = await fetch(url, { headers: ghHeaders() });
+    if (r.status === 404) {
+      // File doesn't exist yet — that's fine, start fresh
+      ghFileSha = null;
+      curatedData = {};
+      updateGHStatus('connected');
+      return;
+    }
+    if (!r.ok) throw new Error('GitHub API ' + r.status);
+    const data = await r.json();
+    ghFileSha = data.sha;
+    const content = atob(data.content.replace(/\n/g, ''));
+    const parsed = JSON.parse(content);
+    if (typeof parsed === 'object' && !Array.isArray(parsed)) {
+      curatedData = parsed;
+    }
+    updateGHStatus('connected');
+  } catch (err) {
+    updateGHStatus('error', err.message);
+  }
+}
+
+async function saveToGitHub() {
+  if (!ghToken) {
+    alert('Enter a GitHub token first (click the key icon in the top bar).');
+    return;
+  }
   saveCurrentSelection();
   const out = {};
   for (const sp of SPECIES) {
@@ -574,133 +590,75 @@ function buildExportJSON() {
       out[sp] = curatedData[sp];
     }
   }
-  return out;
-}
-
-// Save directly to the file handle (or pick one first time)
-async function saveJSON() {
-  const out = buildExportJSON();
   if (Object.keys(out).length === 0) {
     alert('Nothing to save — no species have curated images yet.');
     return;
   }
-  const json = JSON.stringify(out, null, 2);
 
-  // If we have no handle yet, try restoring from IndexedDB
-  if (!fileHandle) fileHandle = await loadFileHandle();
-
-  // Re-verify permission on a restored handle
-  if (fileHandle) {
-    try {
-      if (await fileHandle.queryPermission({ mode: 'readwrite' }) !== 'granted') {
-        if (await fileHandle.requestPermission({ mode: 'readwrite' }) !== 'granted') {
-          fileHandle = null;
-        }
-      }
-    } catch { fileHandle = null; }
-  }
-
-  // If still no handle, ask user to pick the file location
-  if (!fileHandle) {
-    if (typeof window.showSaveFilePicker !== 'function') {
-      // Fallback for Firefox/Safari: classic download
-      downloadJSON(json);
-      return;
-    }
-    try {
-      fileHandle = await window.showSaveFilePicker({
-        suggestedName: 'images.json',
-        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-      });
-      await saveFileHandle(fileHandle);
-    } catch (err) {
-      if (err.name === 'AbortError') return; // user cancelled
-      downloadJSON(json);
-      return;
-    }
-  }
-
-  // Write directly to the file
+  isSaving = true;
+  updateGHStatus('saving');
   try {
-    const writable = await fileHandle.createWritable();
-    await writable.write(json);
-    await writable.close();
-    showSaveNotice();
-  } catch (err) {
-    alert('Save failed: ' + err.message);
-    fileHandle = null;
-  }
-}
+    const json = JSON.stringify(out, null, 2) + '\n';
+    const body = {
+      message: 'Update curated images (' + Object.keys(out).length + ' species)',
+      content: btoa(unescape(encodeURIComponent(json))),
+      branch: GH_BRANCH
+    };
+    if (ghFileSha) body.sha = ghFileSha;
 
-// Fallback download for browsers without File System Access API
-function downloadJSON(json) {
-  const blob = new Blob([json], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'images.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-// Brief "Saved!" flash
-function showSaveNotice() {
-  let el = document.getElementById('save-notice');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'save-notice';
-    el.style.cssText = 'position:fixed;top:16px;right:16px;background:#2d5a27;color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s';
-    document.body.appendChild(el);
-  }
-  el.textContent = 'Saved images.json ✓';
-  el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0'; }, 1800);
-}
-
-// Legacy export (download) — kept as a fallback option
-function exportJSON() {
-  const out = buildExportJSON();
-  if (Object.keys(out).length === 0) {
-    alert('Nothing to export — no species have curated images yet.');
-    return;
-  }
-  downloadJSON(JSON.stringify(out, null, 2));
-}
-
-function importJSON(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid format');
-      // Merge into curatedData
-      for (const [sp, imgs] of Object.entries(data)) {
-        if (SPECIES.includes(sp) && Array.isArray(imgs)) {
-          curatedData[sp] = imgs.map(img => ({
-            url: img.url,
-            label: img.label || 'Other'
-          }));
-        }
-      }
-      // Refresh current view
-      if (currentSpecies && curatedData[currentSpecies]) {
-        selectedImages = curatedData[currentSpecies].map(item => ({
-          url: item.url,
-          thumbUrl: item.url.replace('/800px-', '/400px-'),
-          label: item.label
-        }));
-      }
-      persistCurated();
-      renderSidebar();
-      if (currentSpecies) renderContent();
-      alert('Imported successfully. ' + Object.keys(data).length + ' species loaded.');
-    } catch (err) {
-      alert('Error importing JSON: ' + err.message);
+    const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+    const r = await fetch(url, {
+      method: 'PUT',
+      headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.message || ('HTTP ' + r.status));
     }
+    const result = await r.json();
+    ghFileSha = result.content.sha;
+    updateGHStatus('saved');
+    setTimeout(() => { if (!isSaving) updateGHStatus('connected'); }, 2000);
+  } catch (err) {
+    updateGHStatus('error', 'Save failed: ' + err.message);
+    alert('Save failed: ' + err.message);
+  } finally {
+    isSaving = false;
+  }
+}
+
+function updateGHStatus(state, detail) {
+  const el = document.getElementById('gh-status');
+  if (!el) return;
+  const labels = {
+    disconnected: '<span style="color:#999">Not connected</span>',
+    loading:  '<span style="color:#b58900">Loading...</span>',
+    saving:   '<span style="color:#b58900">Saving...</span>',
+    connected:'<span style="color:#2d5a27">Connected</span>',
+    saved:    '<span style="color:#2d5a27">Saved!</span>',
+    error:    '<span style="color:#c33">Error' + (detail ? ': ' + escHtml(detail) : '') + '</span>'
   };
-  reader.readAsText(file);
-  event.target.value = '';
+  el.innerHTML = labels[state] || '';
+}
+
+// ================================================================
+// TOKEN PROMPT
+// ================================================================
+function showTokenPrompt() {
+  const token = prompt(
+    'Enter a GitHub Personal Access Token with "repo" scope.\n' +
+    'Create one at: github.com/settings/tokens\n\n' +
+    'Current: ' + (ghToken ? ghToken.slice(0, 8) + '...' : '(none)')
+  );
+  if (token === null) return; // cancelled
+  ghToken = token.trim();
+  if (ghToken) {
+    localStorage.setItem('gh-token', ghToken);
+  } else {
+    localStorage.removeItem('gh-token');
+  }
+  init();
 }
 
 // ================================================================
@@ -716,7 +674,30 @@ function escAttr(s) {
 // ================================================================
 // INIT
 // ================================================================
-renderSidebar();
+async function init() {
+  curatedData = {};
+  ghFileSha = null;
+  if (ghToken) {
+    await loadFromGitHub();
+  } else {
+    updateGHStatus('disconnected');
+  }
+  renderSidebar();
+  if (currentSpecies) {
+    // Restore selected images for current species from loaded data
+    if (curatedData[currentSpecies]) {
+      selectedImages = curatedData[currentSpecies].map(item => ({
+        url: item.url,
+        thumbUrl: item.url.replace('/800px-', '/400px-'),
+        label: item.label
+      }));
+    } else {
+      selectedImages = [];
+    }
+    renderContent();
+  }
+}
+init();
 </script>
 </body>
 </html>
