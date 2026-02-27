@@ -1,0 +1,52 @@
+{
+  "Fagus sylvatica": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Fagus_sylvatica_TK_2023-05-06_1.jpg/500px-Fagus_sylvatica_TK_2023-05-06_1.jpg",
+      "label": "Whole tree"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Beech005.JPG/500px-Beech005.JPG",
+      "label": "Whole tree"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Opengebarsten_vrucht_van_beuk_%28Fagus_sylvatica%29_%28d.j.b.%29_02.jpg/500px-Opengebarsten_vrucht_van_beuk_%28Fagus_sylvatica%29_%28d.j.b.%29_02.jpg",
+      "label": "Whole tree"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/20170921Fagus_sylvatica1.jpg/500px-20170921Fagus_sylvatica1.jpg",
+      "label": "Leaves"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/00_5171_Fagus_sylvatica_%28fruit%29_-_Rotbuche.jpg/500px-00_5171_Fagus_sylvatica_%28fruit%29_-_Rotbuche.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/20130617Rotbuche_Schwetzinger_Hardt3.jpg/500px-20130617Rotbuche_Schwetzinger_Hardt3.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/20150429Fagus_sylvatica2.jpg/500px-20150429Fagus_sylvatica2.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Beuk_%28Fagus_sylvatica%29%2C_zwellende_bladknop._24-04-2022_%28d.j.b.%29.jpg/500px-Beuk_%28Fagus_sylvatica%29%2C_zwellende_bladknop._24-04-2022_%28d.j.b.%29.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Buk_edited.jpg/500px-Buk_edited.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/2017-11-24_%28141%29_Fagus_sylvatica_%28European_beech%29_with_lichen_at_Gr%C3%BCntalkogel%2C_Texingtal%2C_Austria.jpg/500px-2017-11-24_%28141%29_Fagus_sylvatica_%28European_beech%29_with_lichen_at_Gr%C3%BCntalkogel%2C_Texingtal%2C_Austria.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/20140212Fagus_sylvatica6.jpg/500px-20140212Fagus_sylvatica6.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/2023-12-22_11_56_30_Purple_European_Beech_bark_along_Lochatong_Road_at_Forest_Lane_in_the_Mountainview_section_of_Ewing_Township%2C_Mercer_County%2C_New_Jersey.jpg/500px-2023-12-22_11_56_30_Purple_European_Beech_bark_along_Lochatong_Road_at_Forest_Lane_in_the_Mountainview_section_of_Ewing_Township%2C_Mercer_County%2C_New_Jersey.jpg",
+      "label": "Bark"
+    }
+  ]
+}
