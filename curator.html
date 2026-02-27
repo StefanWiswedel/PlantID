@@ -73,17 +73,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .sel-actions button{width:28px;height:28px;border:1px solid #ddd;border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#555}
 .sel-actions button:hover{background:#eee}
 .sel-actions button.remove{color:#c33}
+
+/* Back link */
+.back-link{display:inline-flex;align-items:center;gap:4px;color:#2d5a27;font-size:13px;font-weight:500;text-decoration:none;margin-right:auto}
+.back-link:hover{text-decoration:underline}
+
+/* Mobile species selector */
+.mobile-select{display:none;width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:#222;margin-bottom:12px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+/* Responsive */
+@media(max-width:700px){
+  .sidebar{display:none}
+  .mobile-select{display:block}
+  .main{flex-direction:column;height:auto;min-height:calc(100vh - 45px)}
+  .content{padding:12px}
+  .img-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+  .toolbar{gap:6px}
+  .toolbar button,.toolbar label{padding:5px 10px;font-size:12px}
+  .sel-item{flex-wrap:wrap;gap:8px}
+  .sel-thumb{width:44px;height:44px}
+  .sel-actions{flex-direction:row}
+  .top-bar h1{font-size:14px}
+}
 </style>
 </head>
 <body>
 <div class="top-bar">
-  <h1>Flora Sjælland — Image Curator</h1>
-  <div class="progress"><strong id="prog-count">0</strong> / 20 species curated</div>
+  <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</a>
+  <h1>Image Curator</h1>
+  <div class="progress"><strong id="prog-count">0</strong> / 20 curated</div>
 </div>
 <div class="main">
   <div class="sidebar" id="sidebar"></div>
   <div class="content" id="content">
-    <div class="status">Select a species from the sidebar to begin curating images.</div>
+    <select class="mobile-select" id="mobile-select" onchange="if(this.value)selectSpecies(this.value)">
+      <option value="">Choose a species...</option>
+    </select>
+    <div class="status" id="main-status">Select a species to begin curating images.</div>
   </div>
 </div>
 
@@ -236,6 +262,15 @@ function renderSidebar() {
       '<div class="sp-tick' + (done ? ' done' : '') + '">' + (done ? '✓' : '') + '</div>' +
       '<div class="sp-info"><div class="sp-en">' + sp + '</div></div></div>';
   }).join('');
+  // Mobile dropdown
+  const sel = document.getElementById('mobile-select');
+  if(sel) {
+    sel.innerHTML = '<option value="">Choose a species...</option>' +
+      SPECIES.map(sp => {
+        const done = curatedData[sp] && curatedData[sp].length > 0;
+        return '<option value="' + escAttr(sp) + '"' + (sp===currentSpecies?' selected':'') + '>' + (done?'✓ ':'') + sp + '</option>';
+      }).join('');
+  }
   updateProgress();
 }
 
