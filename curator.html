@@ -673,8 +673,12 @@ function updateGHStatus(state, detail) {
 // ================================================================
 function showTokenPrompt() {
   const token = prompt(
-    'Enter a GitHub Personal Access Token with "repo" scope.\n' +
-    'Create one at: github.com/settings/tokens\n\n' +
+    'Enter a GitHub Personal Access Token.\n\n' +
+    'To create one:\n' +
+    '1. Go to github.com/settings/tokens\n' +
+    '   (Settings → Developer settings → Personal access tokens)\n' +
+    '2. Create a Fine-grained token scoped to PlantID\n' +
+    '   with "Contents: Read and write" permission\n\n' +
     'Current: ' + (ghToken ? ghToken.slice(0, 8) + '...' : '(none)')
   );
   if (token === null) return; // cancelled
