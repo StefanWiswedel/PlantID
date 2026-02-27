@@ -130,9 +130,73 @@ const LABELS = ['Whole tree','Bark','Leaves','Flowers','Fruit/Seeds','Buds/Twigs
 
 const COMMONS = 'https://commons.wikimedia.org/w/api.php';
 
-const SKIP_CAT = /cultivar|illustration|drawing|painting|wood\b|timber|fossil|forest|hedge|seedling|root|garden|avenue|street|purpurea|pendula|asplenifolia|tortuosa|fastigiata|dawyck|zlatia|tricolor|laciniata|disease|pest|gall/i;
+// Categories to skip (not useful for field identification)
+const SKIP_CAT = new RegExp([
+  // Cultivars & varieties
+  'cultivar','purpurea','pendula','asplenifolia','tortuosa','fastigiata',
+  'dawyck','zlatia','tricolor','laciniata','rotundifolia','atropurpurea',
+  'atropunicea','riversii','dissecta','lutescens','columnaris','variegat',
+  // Art & illustrations
+  'illustration','drawing','painting','engrav','watercolour','artwork',
+  'print','lithograph','woodcut','sculpture','carving','statue',
+  // Wood products & industry
+  '\\bwood\\b','timber','lumber','furniture','veneer','plank','charcoal',
+  // Locations & geography (subcats like "Fagus sylvatica in France")
+  'in\\s+(the\\s+)?[A-Z]','\\bin\\s+\\w+$','country','region','province',
+  'national','state\\b','county','district','municipality',
+  // Historical & archival
+  'histor','archiv','\\bold\\b','centur','vintage','antique','heritage',
+  'monument','memorial',
+  // People & events
+  'people','person','human','portrait','tourist','visitor','child',
+  'festival','ceremony','event','exhibition',
+  // Landscape & urban
+  'avenue','street','park[^a-z]','garden','urban','city','town','village',
+  'road','path','landscape','panorama','skyline','aerial',
+  // Science & specimens
+  'fossil','herbarium','microscop','anatomy','cross.?section','pollen',
+  'phytopatholog','mycolog',
+  // Disease & pests
+  'disease','pest','gall','infest','damage','declin','dieback',
+  // Forestry & management
+  'forest','forestry','logging','plantation','nursery','seedling',
+  'hedge','shelter.?belt','coppic','pollard',
+  // Other non-useful
+  'root','stump','\\bdead\\b','fallen','storm','symbol','heraldry',
+  'coat.?of.?arms','emblem','\\bflag\\b','stamp','currency','banknote',
+  'food','culinar','recipe','honey','syrup','medicine','pharm',
+  'mythology','folklore','legend','literature','book','film','album'
+].join('|'), 'i');
 
-const SKIP_FILE = /wood[_ ]|timber|lumber|plank|floor|veneer|board|furniture|fossil|herbarium|microscop|cross[_ -]?section|anatomy|pollen|painting|drawing|illustration|engraving|museum|stamp|coin|logo|icon|map[_ ]|diagram|flag|\.svg/i;
+// Filenames to skip
+const SKIP_FILE = new RegExp([
+  // Wood & products
+  'wood[_ ]','timber','lumber','plank','floor','veneer','board','furniture',
+  'charcoal','firewood','pellet',
+  // Science & specimens
+  'fossil','herbarium','microscop','cross[_ -]?section','anatomy',
+  'pollen[_ ]grain','histolog','cytolog',
+  // Art & reproductions
+  'painting','drawing','illustration','engraving','lithograph','woodcut',
+  'watercolour','artwork','sculpture','statue','carving',
+  // Historical & archival
+  'historical[_ ]','\\d{4}[_ ](painting|drawing|engraving|print)',
+  'archiv','centur','vintage','antique','postcard',
+  // People
+  'person','people','portrait','tourist','crowd','group[_ ]of[_ ]people',
+  'child','woman','\\bman\\b','selfie','farmer','worker','student',
+  // Non-photo media
+  'museum','stamp','coin','logo','icon','map[_ ]','diagram','\\bflag\\b',
+  '\\.svg','chart','graph','infographic','screenshot','scan[_ ]',
+  // Cultivars
+  'cultivar','purpurea','pendula','asplenifolia','tortuosa','fastigiata',
+  'f\\.\\s?purpurea','variegat',
+  // Products & food
+  'food','dish','plate','bowl','jam','pie','cake','syrup','tea[_ ]',
+  'honey','juice','wine','beer','liqueur','table[_ ]','kitchen',
+  // Urban & landscape
+  'aerial','panorama','skyline','drone','satellite'
+].join('|'), 'i');
 
 // Map subcategory keywords → label
 const LABEL_MAP = [
