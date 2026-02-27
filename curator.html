@@ -228,13 +228,18 @@ function shortCatName(catTitle, speciesName) {
 }
 
 // ================================================================
-// STATE
+// STATE — auto-persisted to localStorage
 // ================================================================
 let curatedData = {};    // { "Fagus sylvatica": [{url, label}, ...], ... }
+try { const saved = localStorage.getItem('flora-curated'); if (saved) curatedData = JSON.parse(saved); } catch {}
 let currentSpecies = null;
 let loadedImages = [];   // [{url, thumbUrl, srcLabel, catName}]
 let selectedImages = []; // [{url, thumbUrl, label}]
 let isLoading = false;
+
+function persistCurated() {
+  try { localStorage.setItem('flora-curated', JSON.stringify(curatedData)); } catch {}
+}
 
 // ================================================================
 // COMMONS API
@@ -396,6 +401,7 @@ function saveCurrentSelection() {
   } else {
     delete curatedData[currentSpecies];
   }
+  persistCurated();
   renderSidebar();
 }
 
@@ -573,6 +579,7 @@ function importJSON(event) {
           label: item.label
         }));
       }
+      persistCurated();
       renderSidebar();
       if (currentSpecies) renderContent();
       alert('Imported successfully. ' + Object.keys(data).length + ' species loaded.');
