@@ -236,10 +236,10 @@ function shortCatName(catTitle, speciesName) {
 // ================================================================
 const GH_OWNER = 'StefanWiswedel';
 const GH_REPO  = 'PlantID';
-const GH_BRANCH = 'main';
 const GH_FILE  = 'images.json';
 const GH_API   = 'https://api.github.com';
 
+let ghBranch = null;   // detected from GitHub Pages config
 let ghToken = localStorage.getItem('gh-token') || '';
 let ghFileSha = null;  // SHA of the current images.json (needed for updates)
 
@@ -551,11 +551,36 @@ function ghHeaders() {
   };
 }
 
+async function detectBranch() {
+  // Use the GitHub Pages API to find which branch is being served
+  try {
+    const r = await fetch(GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/pages', { headers: ghHeaders() });
+    if (r.ok) {
+      const data = await r.json();
+      if (data.source && data.source.branch) {
+        ghBranch = data.source.branch;
+        return;
+      }
+    }
+  } catch {}
+  // Fallback: use the repo's default branch
+  try {
+    const r = await fetch(GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO, { headers: ghHeaders() });
+    if (r.ok) {
+      const data = await r.json();
+      ghBranch = data.default_branch || 'main';
+      return;
+    }
+  } catch {}
+  ghBranch = 'main';
+}
+
 async function loadFromGitHub() {
   if (!ghToken) return;
   updateGHStatus('loading');
   try {
-    const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE + '?ref=' + GH_BRANCH;
+    await detectBranch();
+    const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE + '?ref=' + ghBranch;
     const r = await fetch(url, { headers: ghHeaders() });
     if (r.status === 404) {
       // File doesn't exist yet — that's fine, start fresh
@@ -602,7 +627,7 @@ async function saveToGitHub() {
     const body = {
       message: 'Update curated images (' + Object.keys(out).length + ' species)',
       content: btoa(unescape(encodeURIComponent(json))),
-      branch: GH_BRANCH
+      branch: ghBranch
     };
     if (ghFileSha) body.sha = ghFileSha;
 
@@ -631,12 +656,13 @@ async function saveToGitHub() {
 function updateGHStatus(state, detail) {
   const el = document.getElementById('gh-status');
   if (!el) return;
+  const branch = ghBranch ? ' <span style="font-size:11px;color:#888">(' + escHtml(ghBranch) + ')</span>' : '';
   const labels = {
     disconnected: '<span style="color:#999">Not connected</span>',
     loading:  '<span style="color:#b58900">Loading...</span>',
     saving:   '<span style="color:#b58900">Saving...</span>',
-    connected:'<span style="color:#2d5a27">Connected</span>',
-    saved:    '<span style="color:#2d5a27">Saved!</span>',
+    connected:'<span style="color:#2d5a27">Connected</span>' + branch,
+    saved:    '<span style="color:#2d5a27">Saved!</span>' + branch,
     error:    '<span style="color:#c33">Error' + (detail ? ': ' + escHtml(detail) : '') + '</span>'
   };
   el.innerHTML = labels[state] || '';
