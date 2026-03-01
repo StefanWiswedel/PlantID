@@ -122,59 +122,19 @@ img{display:block;max-width:100%}
 .conf-n{font-weight:500;font-size:.85rem}
 .conf-d{font-size:.82rem;color:var(--tx2);margin-top:4px;line-height:1.55}
 
-/* === IDENTIFY VIEW (TREE) === */
+/* === IDENTIFY VIEW === */
 .ih{padding:calc(var(--st) + 28px) 24px 20px;background:linear-gradient(160deg,#1b4332,#2d6a4f)}
 .it{font-family:var(--fs);font-size:1.9rem;color:#fff;font-weight:700}
 .it-sub{color:rgba(255,255,255,.55);font-size:.82rem;margin-top:6px;font-weight:300}
-.ii{text-align:center;padding:48px 24px}
-.ii p{color:var(--tx2);font-size:.88rem;margin-top:8px;max-width:300px;margin-inline:auto;line-height:1.5}
-.is{display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:14px 28px;border-radius:100px;background:var(--ac);color:#fff;font-size:.88rem;font-weight:500;transition:transform .15s}
-.is:active{transform:scale(.96)}
-
-/* Tree path */
-.tree-wrap{padding:20px 16px 40px}
-.tree-restart{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:var(--tx2);margin-bottom:16px;padding:6px 12px;border-radius:100px;border:1px solid var(--bd)}
-.tree-restart:active{background:var(--acl);color:var(--ac)}
-
-/* Answered steps */
-.tree-step{position:relative;padding-left:32px;padding-bottom:4px;margin-bottom:4px}
-.tree-step::before{content:'';position:absolute;left:9px;top:20px;bottom:-4px;width:2px;background:var(--ac);opacity:.2}
-.tree-step:last-child::before{display:none}
-.tree-step .tree-dot{position:absolute;left:2px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--acl);border:2px solid var(--ac)}
-.tree-step-q{font-size:.76rem;color:var(--tx2);line-height:1.3;margin-bottom:3px}
-.tree-step-a{font-size:.84rem;font-weight:500;color:var(--ac);line-height:1.3;padding:4px 0 8px}
-
-/* Current question */
-.tree-current{position:relative;padding-left:32px;margin-top:4px}
-.tree-current .tree-dot{position:absolute;left:2px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--ac);box-shadow:0 0 0 4px var(--acl)}
-.tree-q{font-family:var(--fs);font-size:1.15rem;line-height:1.35;margin-bottom:14px;color:var(--tx)}
-
-/* Branch options */
-.tree-options{display:flex;flex-direction:column;gap:8px}
-.tree-options.binary{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tree-opt{text-align:left;padding:14px 16px;border:2px solid var(--bd);border-radius:var(--rad);font-size:.84rem;line-height:1.45;background:var(--sf);transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.tree-opt:active{border-color:var(--ac);background:var(--acl);transform:scale(.97)}
-
-/* Result */
-.tree-result{position:relative;padding-left:32px;margin-top:4px}
-.tree-result .tree-dot{position:absolute;left:2px;top:6px;width:16px;height:16px;border-radius:50%;background:var(--wm);box-shadow:0 0 0 4px var(--wml)}
-.kr{text-align:center;padding:8px 0 20px}
-.kr-l{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tx2);font-weight:600}
-.kr-n{font-family:var(--fs);font-size:1.6rem;margin-top:6px}
-.kr-la{font-style:italic;color:var(--tx2);font-weight:300}
-.kri{width:140px;height:140px;border-radius:50%;margin:20px auto;background:#e0ddd6;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.1)}
-.kri img{width:100%;height:100%;object-fit:cover}
-.kr-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-.kr-btns button{padding:12px 22px;border-radius:100px;font-size:.84rem;font-weight:500;transition:transform .15s}
-.kr-btns button:active{transform:scale(.96)}
-.bp{background:var(--ac);color:#fff}.bs{border:1.5px solid var(--bd);color:var(--tx)}
 
 /* === SMART FILTER === */
-.sf-tabs{display:flex;gap:0;margin:0 16px;border-bottom:2px solid var(--bd)}
-.sf-tab{flex:1;padding:12px 0;text-align:center;font-size:.82rem;font-weight:500;color:var(--tx2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
-.sf-tab.on{color:var(--ac);border-bottom-color:var(--ac)}
-.sf-wrap{padding:12px 16px 120px}
+.sf-wrap{padding:12px 16px 24px}
 .sf-intro{text-align:center;color:var(--tx2);font-size:.84rem;padding:8px 0 16px;line-height:1.5}
+.sf-match-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;margin:0 16px 8px;background:var(--sf);border-radius:var(--rad);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sf-match-count{font-size:.88rem;font-weight:600}
+.sf-match-count strong{color:var(--ac)}
+.sf-match-reset{font-size:.78rem;color:var(--wm);font-weight:500;padding:4px 10px;border-radius:6px}
+.sf-match-reset:active{background:var(--wml)}
 .sf-cat{background:var(--sf);border-radius:var(--rad);margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
 .sf-cat-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sf-cat-head:active{background:rgba(0,0,0,.02)}
@@ -190,25 +150,16 @@ img{display:block;max-width:100%}
 .sf-opt{padding:9px 14px;border:1.5px solid var(--bd);border-radius:100px;font-size:.8rem;color:var(--tx);background:var(--bg);transition:all .15s;-webkit-tap-highlight-color:transparent}
 .sf-opt:active{transform:scale(.96)}
 .sf-opt.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.sf-bar{position:fixed;bottom:calc(var(--th) + var(--sb));left:0;right:0;z-index:800;background:var(--sf);border-top:1px solid var(--bd);padding:12px 16px;box-shadow:0 -2px 12px rgba(0,0,0,.06);display:none}
-.sf-bar.on{display:block;animation:slideUp .2s ease}
-.sf-bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.sf-bar-count{font-size:.88rem;font-weight:600}
-.sf-bar-count strong{color:var(--ac)}
-.sf-bar-reset{font-size:.78rem;color:var(--wm);font-weight:500;padding:4px 10px;border-radius:6px}
-.sf-bar-reset:active{background:var(--wml)}
-.sf-results{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
-.sf-results::-webkit-scrollbar{display:none}
-.sf-rcard{flex-shrink:0;width:110px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.sf-rcard:active{transform:scale(.96)}
-.sf-rimg{width:110px;height:80px;border-radius:10px;overflow:hidden;background:#e0ddd6;margin-bottom:6px}
-.sf-rimg img{width:100%;height:100%;object-fit:cover}
-.sf-rname{font-size:.74rem;font-weight:500;line-height:1.2}
-.sf-rla{font-size:.66rem;color:var(--tx2);font-style:italic;font-weight:300}
-.sf-conf{margin-top:12px;padding:14px;background:var(--acl);border-radius:var(--rad)}
-.sf-conf-title{font-size:.78rem;font-weight:600;color:var(--ac);margin-bottom:6px}
-.sf-conf-tip{font-size:.8rem;color:var(--tx);line-height:1.5}
-.sf-conf-sp{font-weight:500}
+.sf-opt.dim{opacity:.35;pointer-events:none}
+.sf-opt .ct{font-size:.68rem;color:var(--tx3);margin-left:3px}
+.sf-opt.on .ct{color:rgba(255,255,255,.7)}
+.sf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px 16px 24px}
+
+/* Loading state */
+.loading{display:flex;align-items:center;justify-content:center;min-height:50vh;flex-direction:column;gap:12px}
+.loading p{color:var(--tx2);font-size:.88rem}
+.spinner{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* === FIELD LOG === */
 .mh{padding:calc(var(--st) + 28px) 24px 20px;background:linear-gradient(160deg,#1b4332,#2d6a4f)}
@@ -286,16 +237,15 @@ img{display:block;max-width:100%}
 <body>
 <div id="app">
   <div class="v on" id="v-browse">
-    <div class="bh"><div class="logo">Flora <i>Sjælland</i></div><p class="bsub">20 common trees &amp; shrubs of Zealand</p><a class="bh-link" href="curator.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Curate Images</a></div>
+    <div class="bh"><div class="logo">Flora <i>Sjælland</i></div><p class="bsub" id="bsub">Common plants of Zealand</p><a class="bh-link" href="curator.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Curate Images</a></div>
     <div class="pills" id="pills"></div>
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid"><div class="loading"><div class="spinner"></div><p>Loading species...</p></div></div>
   </div>
   <div class="v" id="v-identify">
-    <div class="ih"><h1 class="it">Identify</h1><p class="it-sub">Narrow down your tree by features or follow a step-by-step key</p></div>
-    <div class="sf-tabs"><button class="sf-tab on" onclick="setIdMode('filter')">Smart Filter</button><button class="sf-tab" onclick="setIdMode('key')">Decision Tree</button></div>
+    <div class="ih"><h1 class="it">Identify</h1><p class="it-sub">Select features you can see to narrow down species</p></div>
+    <div id="sf-match"></div>
     <div id="sf-content"></div>
-    <div id="idc" style="display:none"><div class="ii"><p>Answer step-by-step questions to narrow down the species.</p><button class="is" onclick="startKey()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>Begin Identification</button></div></div>
-    <div class="sf-bar" id="sf-bar"></div>
+    <div class="sf-grid" id="sf-grid"></div>
   </div>
   <div class="v" id="v-fieldlog">
     <div class="mh"><div class="logo">Field <i>Log</i></div></div>
@@ -350,124 +300,44 @@ img{display:block;max-width:100%}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ================================================================
-// SPECIES DATA
+// DATA (loaded from species.json)
 // ================================================================
-const GRP=[
-{id:'broadleaf',name:'Indigenous Broadleaf',fg:'#2d5a27',bg:'#eaf2e8'},
-{id:'conifer',name:'Conifers',fg:'#3d6b5e',bg:'#e5f0ec'},
-{id:'intro',name:'Introduced & Planted',fg:'#7a5c2e',bg:'#f5efe5'},
-{id:'shrub',name:'Shrubs & Small Trees',fg:'#6e3d5b',bg:'#f3e8ee'}
-];
-const SP=[
-{id:'fagus-sylvatica',la:'Fagus sylvatica',en:'European Beech',da:'Bøg',g:'broadleaf',ht:'25–40 m',life:'300–400 yr',hab:'Dominant forest tree on well-drained, fertile soils throughout Sjælland. Prefers slightly acidic to calcareous ground.',feat:['Smooth silver-grey bark that remains smooth even on old trees','Oval leaves 5–10 cm with wavy (not toothed) margins, silky-hairy when young','Buds long (15–20 mm), sharply pointed, cigar-shaped, copper-brown','Fruit: triangular nuts (beech mast) in pairs inside a spiny 4-valved husk','Dense canopy casting deep shade; little understorey'],season:'Leaves emerge pale green April–May, turn golden-copper in autumn. Dead leaves persist on young trees through winter (marcescence).',conf:[{sp:'Carpinus betulus (Hornbeam)',d:'Hornbeam has doubly serrate (toothed) leaf margins and a fluted/ridged trunk; beech has wavy-edged leaves and always-smooth bark.'}]},
-{id:'quercus-robur',la:'Quercus robur',en:'Pedunculate Oak',da:'Stilk-eg',g:'broadleaf',ht:'20–35 m',life:'500–1000+ yr',hab:'Mixed forests, hedgerows, parkland. Tolerates heavy clay. Very common across Sjælland.',feat:['Deeply lobed leaves with 4–5 rounded lobe pairs; very short petiole (<5 mm)','Bark deeply fissured into rough vertical ridges on mature trees','Acorns on long stalks (peduncles) 3–7 cm — the key diagnostic','Clustered buds at twig tips, ovoid, orange-brown','Branches often gnarled; irregular crown on old specimens'],season:'Late to leaf out (May). Brown autumn leaves may persist on young trees. Acorns ripen September–October.',conf:[{sp:'Quercus petraea (Sessile Oak)',d:'Sessile oak has longer leaf stalks (1–2 cm) and acorns sitting directly on the twig without peduncles. Rarer on Sjælland.'}]},
-{id:'betula-pendula',la:'Betula pendula',en:'Silver Birch',da:'Vortebirk',g:'broadleaf',ht:'15–25 m',life:'60–90 yr',hab:'Pioneer species on sandy, acidic, or disturbed soils. Heathland edges, roadsides, open woodland.',feat:['White papery bark peeling in horizontal strips; base becomes black and fissured with age','Small triangular-rhombic leaves (3–7 cm), doubly serrate margins','Twigs slender, pendulous (hanging), with small warty resin glands','Male catkins pendulous, 3–6 cm; female catkins smaller, upright then drooping','Light, airy crown — never dense shade'],season:'Among the first trees to leaf out in spring. Yellow autumn colour. Male catkins visible from autumn through winter.',conf:[{sp:'Betula pubescens (Downy Birch)',d:'Downy birch has hairy (not warty) young twigs, more rounded leaves, greyer bark, and prefers wetter soils.'}]},
-{id:'fraxinus-excelsior',la:'Fraxinus excelsior',en:'European Ash',da:'Ask',g:'broadleaf',ht:'20–35 m',life:'200–300 yr',hab:'Fertile moist soils; forests, hedgerows. Common but declining due to ash dieback (Hymenoscyphus fraxineus).',feat:['Compound pinnate leaves with 7–13 leaflets, opposite arrangement on the twig','Distinctive jet-black buds — very reliable winter ID feature','Bark smooth and pale grey when young, developing shallow fissures with age','Winged seeds (keys) in dense hanging clusters, single-winged','Last native tree to leaf out in spring; first to drop leaves in autumn'],season:'Leafs out late May. Seeds persist into winter. Black buds are the best year-round ID.',conf:[{sp:'Sorbus aucuparia (Rowan)',d:'Rowan also has pinnate leaves but leaflets are smaller (3–6 cm), sharply toothed, alternate on branch; buds purple-grey and hairy, not black.'}]},
-{id:'tilia-cordata',la:'Tilia cordata',en:'Small-leaved Lime',da:'Småbladet lind',g:'broadleaf',ht:'20–30 m',life:'500–1000+ yr',hab:'Mixed deciduous forests on fertile soils. Also widely planted as a street and park tree.',feat:['Heart-shaped leaves 3–8 cm with pointed tip and asymmetric base','Underside has characteristic orange-brown hair tufts in vein axils','Bark smooth grey when young, finely fissured with age','Fragrant yellowish flowers in clusters hanging from a wing-like bract (July)','Small round fruits (4–6 mm), thin-walled, without prominent ribs'],season:'Fragrant flowering in July attracts abundant insects. Leaves turn yellow in autumn.',conf:[{sp:'Tilia platyphyllos (Large-leaved Lime)',d:'Larger leaves (6–15 cm), white hair tufts beneath (not orange-brown), and ribbed, thick-walled fruits.'}]},
-{id:'alnus-glutinosa',la:'Alnus glutinosa',en:'Common Alder',da:'Rødel',g:'broadleaf',ht:'15–25 m',life:'60–100 yr',hab:'Wet ground: stream banks, bog margins, lakeshores, damp forest. Nitrogen-fixer.',feat:['Rounded leaves 5–10 cm with a notched (retuse) apex — distinctive flat or indented leaf tip','Young leaves and buds are sticky (glutinous)','Small woody cone-like fruits (1–2 cm) persist year-round — key winter ID','Bark dark brown to blackish, fissured into small squares on mature trees','Male catkins purple-stalked, visible from autumn, opening before leaves'],season:'Catkins open February–March. Woody cones persist through winter. Always near water.',conf:[{sp:'Alnus incana (Grey Alder)',d:'Grey alder has pointed (not notched) leaf tips, grey bark, and grey-hairy leaf undersides. Less common on Sjælland.'}]},
-{id:'populus-tremula',la:'Populus tremula',en:'Aspen',da:'Bævreasp',g:'broadleaf',ht:'15–25 m',life:'50–100 yr',hab:'Forest edges, clearings, roadsides. Pioneer species. Spreads vigorously by root suckers.',feat:['Rounded leaves 3–8 cm on very long, flattened petioles — leaves tremble in slightest breeze','Leaf margin with blunt rounded teeth (crenate)','Bark smooth greenish-grey; darker and furrowed at base with age','Long grey drooping catkins appear before leaves, March–April','Often forms clonal stands from root suckers'],season:'Trembling leaves audible in summer. Catkins appear early spring. Good golden-yellow autumn colour.',conf:[{sp:'Populus × canescens (Grey Poplar)',d:'Grey poplar leaves are greyish-white and downy beneath. Often larger. Hybrid origin.'}]},
-{id:'ulmus-glabra',la:'Ulmus glabra',en:'Wych Elm',da:'Storbladet elm',g:'broadleaf',ht:'20–35 m',life:'200–400 yr',hab:'Mixed forests, hedgerows, ravines. Prefers fertile moist soils. Declining due to Dutch elm disease.',feat:['Large leaves 8–16 cm with markedly asymmetric base — one side extends further down petiole','Leaf surface very rough (sandpapery) with stiff hairs on upper side','Doubly serrate leaf margin','Winged seeds (samaras) with seed in centre of wing; appear before leaves','Buds dark brown, hairy; bark grey-brown, rough fissures'],season:'Flowers and fruits appear March–April before leaves. Leaves turn yellow in autumn.',conf:[{sp:'Ulmus minor (Field Elm)',d:'Field elm has smaller, smoother, glossy leaves with less pronounced asymmetry. Suckering habit. Very rare on Sjælland.'}]},
-{id:'picea-abies',la:'Picea abies',en:'Norway Spruce',da:'Rødgran',g:'conifer',ht:'30–50 m',life:'200–400 yr',hab:'Widely planted forestry species. Not native to Denmark but naturalised. Traditional Danish Christmas tree.',feat:['Needles short (1–2.5 cm), stiff, pointed, singly attached all around the twig','Twig rough with small woody pegs when needles removed — key diagnostic vs fir','Cones pendulous, large (10–18 cm), cylindrical, hanging down','Bark reddish-brown, thin, scaly','Regular conical crown with drooping side-branches'],season:'Evergreen. Light green new growth ("candles") in May. Cones ripen autumn.',conf:[{sp:'Abies (Fir species)',d:'Firs have flat needles with two white stripes beneath, smooth bark with resin blisters, and upright cones that disintegrate on the tree.'}]},
-{id:'pinus-sylvestris',la:'Pinus sylvestris',en:'Scots Pine',da:'Skovfyr',g:'conifer',ht:'20–35 m',life:'150–300 yr',hab:'Sandy soils, heathland, planted forests. Widely planted on Sjælland.',feat:['Needles in pairs, 3–7 cm long, twisted, blue-green','Upper bark distinctive orange-red, flaking in thin plates — visible from distance','Lower trunk bark grey-brown, deeply fissured','Small ovoid cones (3–7 cm), green ripening to grey-brown','Mature trees develop flat-topped or irregular crown, not conical'],season:'Evergreen. Orange upper bark visible year-round. Old needles shed in autumn (normal).',conf:[{sp:'Pinus nigra (Black Pine)',d:'Black pine has much longer needles (10–15 cm), stiffer, not twisted, darker green. Bark uniformly grey-brown without orange upper trunk.'}]},
-{id:'larix-decidua',la:'Larix decidua',en:'European Larch',da:'Europæisk lærk',g:'conifer',ht:'25–40 m',life:'200–300 yr',hab:'Planted in forests and parks. Native to the Alps, introduced to Denmark for forestry.',feat:['Deciduous conifer — the only common conifer that loses needles in winter','Needles soft, light green, 2–4 cm, in rosette-like clusters of 30–40 on short shoots','Small upright cones (2–4 cm), ovoid, persisting on branches for years','Bark grey-brown developing deep fissures and pinkish inner bark','Crown conical when young, broader with age'],season:'Bright fresh green needles in spring; golden-yellow before falling October–November. Bare branches with small cones in winter diagnostic.',conf:[{sp:'Larix kaempferi (Japanese Larch)',d:'Japanese larch has blue-green (glaucous) needles, slightly larger cones with recurved scale tips, reddish-brown twigs.'}]},
-{id:'acer-platanoides',la:'Acer platanoides',en:'Norway Maple',da:'Spidsløn',g:'intro',ht:'20–30 m',life:'150–250 yr',hab:'Forests, parks, streets. Native to eastern Denmark including parts of Sjælland; also very widely planted.',feat:['Leaves with 5 sharply pointed lobes, few large teeth, 10–15 cm wide','Milky sap when leaf petiole is broken — key diagnostic vs sycamore','Bright yellow-green flower clusters appear before leaves in April','Winged seed pairs (samaras) spread at obtuse angle (nearly 180°)','Bark grey, shallow interlacing ridges (not flaking)'],season:'Conspicuous yellow-green flowers April. Excellent yellow autumn colour. Samaras ripen autumn.',conf:[{sp:'Acer pseudoplatanus (Sycamore)',d:'Sycamore has blunter leaf lobes, coarser teeth, no milky sap from petiole, drooping flower clusters (not erect), samaras at more acute angle.'}]},
-{id:'acer-pseudoplatanus',la:'Acer pseudoplatanus',en:'Sycamore Maple',da:'Ahorn',g:'intro',ht:'20–35 m',life:'200–400 yr',hab:'Widely planted in parks, gardens, shelter belts. Naturalised, sometimes invasive. Not native to Denmark.',feat:['Large 5-lobed leaves 10–25 cm wide, lobes with coarse irregular blunt teeth','No milky sap when petiole is broken (unlike Norway maple)','Bark grey, smooth when young, developing large flaking plates revealing pink-brown inner bark','Pendulous flower racemes April–May, after leaf emergence','Winged seed pairs at acute angle (approx. 60–90°)'],season:'Leaves emerge reddish. Often just turns brown in autumn. Flaking bark diagnostic on mature trees.',conf:[{sp:'Acer platanoides (Norway Maple)',d:'Norway maple has sharply pointed lobes, milky sap from petiole, erect yellow-green flower clusters before leaves, widely spread samaras.'}]},
-{id:'aesculus-hippocastanum',la:'Aesculus hippocastanum',en:'Horse Chestnut',da:'Hestekastanje',g:'intro',ht:'20–30 m',life:'200–300 yr',hab:'Parks, avenues, gardens. Native to the Balkans, widely planted across Denmark.',feat:['Large palmate compound leaves with 5–7 leaflets radiating from single point, leaflets 10–25 cm','Very large sticky buds — among the most recognisable winter features of any tree','Upright conical flower "candles" in May, white with pink/yellow markings','Fruit: spiny green husk containing 1–2 glossy brown conkers','Bark grey-brown, scaly, peeling in irregular plates'],season:'Leaf out and flowering May. Conkers fall September–October. Sticky buds key winter ID. Often shows leaf miner damage by midsummer.',conf:[{sp:'Aesculus × carnea (Red Horse Chestnut)',d:'Red horse chestnut has pink-red flowers, smaller leaves. Hybrid, less commonly planted.'}]},
-{id:'carpinus-betulus',la:'Carpinus betulus',en:'European Hornbeam',da:'Avnbøg',g:'intro',ht:'15–25 m',life:'150–300 yr',hab:'Mixed deciduous forests, hedgerows. Native to eastern Denmark including Sjælland. Also widely planted as hedging.',feat:['Oval leaves 5–10 cm with prominent parallel veins, doubly serrate margins','Bark smooth grey with distinctive fluted (muscular) trunk — key diagnostic','Fruit: small nutlet attached to three-lobed leafy bract, in hanging clusters','Buds slender, appressed to twig, shorter than beech buds','Leaves strongly resemble beech but always have clear serrations'],season:'Retains dead brown leaves through winter (marcescence). Fruits ripen autumn. Fluted trunk visible year-round.',conf:[{sp:'Fagus sylvatica (Beech)',d:'Beech has smooth (never fluted) trunk, wavy (not serrate) leaf margins, longer sharper buds. Beech nuts triangular in spiny husk, not winged.'}]},
-{id:'sorbus-aucuparia',la:'Sorbus aucuparia',en:'Rowan',da:'Røn',g:'shrub',ht:'8–15 m',life:'60–100 yr',hab:'Forest edges, clearings, rocky ground, heathland, gardens. Tolerates poor acidic soils.',feat:['Pinnate leaves with 9–15 small leaflets (3–6 cm each), sharply toothed','Alternate leaf arrangement (vs opposite in ash)','Dense clusters of creamy-white flowers May–June','Bright red-orange berry clusters August–September — very conspicuous','Bark smooth shiny grey-silver; buds purple-grey with grey hairs'],season:'Red berries from August. Flowers May–June. Good yellow-red autumn colour.',conf:[{sp:'Fraxinus excelsior (Ash)',d:'Ash has fewer, larger leaflets (5–12 cm), opposite arrangement, black buds, winged seeds not berries. Much larger tree.'}]},
-{id:'prunus-avium',la:'Prunus avium',en:'Wild Cherry',da:'Fuglekirsebær',g:'shrub',ht:'15–25 m',life:'60–100 yr',hab:'Mixed forests, hedgerows, forest edges on fertile soils. Common on Sjælland.',feat:['Bark reddish-brown with prominent horizontal lenticels — peels in horizontal strips','Leaves oval 6–15 cm, serrate margins; two red glands at petiole top','White flowers in clusters of 2–6 on long stalks, with leaves, April–May','Small red to dark red cherries June–July','Autumn colour often excellent — red, orange, yellow'],season:'White blossom April–May. Cherries ripen June–July. Distinctive bark year-round.',conf:[{sp:'Prunus padus (Bird Cherry)',d:'Bird cherry has flowers in elongated racemes (not short clusters), smaller leaves, grey-brown bark without prominent lenticels, unpleasant bark smell.'}]},
-{id:'prunus-padus',la:'Prunus padus',en:'Bird Cherry',da:'Hæg',g:'shrub',ht:'8–15 m',life:'60–80 yr',hab:'Moist woodlands, stream banks, hedgerows. Prefers damp fertile soils.',feat:['Flowers in elongated drooping racemes (10–15 cm) — key diagnostic; May','Small black bitter cherries in drooping strings','Bark smooth dark grey-brown; unpleasant smell when scratched','Leaves elliptic 6–10 cm, finely toothed, dull upper surface','Buds conical, appressed, dark brown'],season:'Fragrant white blossom in May. Black fruit July–August, quickly eaten by birds.',conf:[{sp:'Prunus avium (Wild Cherry)',d:'Wild cherry has flowers in short clusters (not racemes), reddish bark with horizontal bands, red (not black) larger cherries.'}]},
-{id:'salix-caprea',la:'Salix caprea',en:'Goat Willow',da:'Seljepil',g:'shrub',ht:'6–12 m',life:'30–60 yr',hab:'Forest edges, hedgerows, waste ground. Pioneer species. Common throughout Sjælland.',feat:['Leaves broadly elliptic to almost round (5–10 cm), wrinkled surface, grey woolly underside','Large silvery-furry catkins before leaves in March — "pussy willows"','Male catkins turn bright yellow with pollen; female catkins greener','Twigs stout; bark grey-brown with diamond-shaped fissures','Stipules at leaf base (small ear-shaped appendages)'],season:'Among earliest flowering (March). Catkins important early nectar source. Grey woolly leaf undersides all summer.',conf:[{sp:'Salix cinerea (Grey Willow)',d:'Grey willow has narrower leaves, raised ridges under the bark when stripped, and grows in wetter habitats. Often hybridises.'}]},
-{id:'crataegus-monogyna',la:'Crataegus monogyna',en:'Common Hawthorn',da:'Engriflet hvidtjørn',g:'shrub',ht:'4–10 m',life:'200–400 yr',hab:'Hedgerows, scrub, forest edges, pastures. Extremely common. Often planted as hedging.',feat:['Sharp thorns (1–1.5 cm) on branches — key feature','Leaves deeply lobed (3–7 lobes), 2–4 cm, lobes cut more than halfway to midrib','Dense clusters of white (sometimes pink) flowers with a single style, May–June','Dark red haws (berries) with a single stone, September–October','Bark grey-brown, developing orange-brown fissures; gnarled twisted form'],season:'Abundant white "may blossom" in May. Red haws from September. Thorns and gnarled form year-round.',conf:[{sp:'Crataegus laevigata (Midland Hawthorn)',d:'Midland hawthorn has shallower leaf lobes (less than halfway to midrib), 2–3 styles per flower, 2–3 stones per haw.'}]}
-];
-const KEY={
-start:{q:'Does the plant have needles/scales (conifer) or broad flat leaves?',o:[{t:'Needles or scales — conifer',n:'c1'},{t:'Broad flat leaves',n:'b1'}]},
-c1:{q:'Does it lose its needles in autumn?',o:[{t:'Yes — soft light green needles in clusters that turn yellow and fall',r:'larix-decidua'},{t:'No — evergreen',n:'c2'}]},
-c2:{q:'How are the needles arranged?',o:[{t:'In pairs, 3–7 cm, twisted; upper bark orange-red',r:'pinus-sylvestris'},{t:'Single, short (1–2.5 cm), stiff, all around twig; twig rough when stripped',r:'picea-abies'}]},
-b1:{q:'Are the leaves compound (divided into separate leaflets)?',o:[{t:'Yes — distinct leaflets',n:'b2'},{t:'No — single blade (may be lobed)',n:'b5'}]},
-b2:{q:'How are the leaflets arranged?',o:[{t:'Radiating from one point like a hand (palmate); large sticky buds',r:'aesculus-hippocastanum'},{t:'In pairs along a central stalk (pinnate)',n:'b3'}]},
-b3:{q:'How are the leaves arranged on the branch?',o:[{t:'Opposite pairs; leaflets 5–12 cm; jet-black buds',r:'fraxinus-excelsior'},{t:'Alternate; small leaflets (3–6 cm); red berries in autumn',r:'sorbus-aucuparia'}]},
-b5:{q:'Is the leaf clearly lobed (deep indentations)?',o:[{t:'Yes — distinct lobes',n:'b6'},{t:'No — toothed, wavy, or smooth edge',n:'b10'}]},
-b6:{q:'What shape are the lobes?',o:[{t:'Pointed star-like lobes; leaves opposite',n:'b7'},{t:'Rounded lobes; leaves alternate',n:'b8'},{t:'Small leaf (2–4 cm) with deep narrow lobes; thorns',r:'crataegus-monogyna'}]},
-b7:{q:'Break the leaf stalk. Is there milky sap?',o:[{t:'Yes — milky white sap; sharp-toothed lobes',r:'acer-platanoides'},{t:'No milky sap; blunt-toothed lobes; bark flakes on old trees',r:'acer-pseudoplatanus'}]},
-b8:{q:'Examine the lobes and fruit:',o:[{t:'4–5 pairs of rounded lobes; very short leaf stalk; acorns on long stalks',r:'quercus-robur'}]},
-b10:{q:'Look at the bark:',o:[{t:'White/silvery, peeling in papery strips',r:'betula-pendula'},{t:'Reddish-brown with horizontal bands',n:'b15'},{t:'Smooth grey',n:'b11'},{t:'Dark, fissured or rough',n:'b13'}]},
-b11:{q:'Is the trunk fluted or muscular-looking?',o:[{t:'Yes — fluted ridges; doubly serrate leaves with parallel veins',r:'carpinus-betulus'},{t:'No — smooth round trunk; wavy-edged leaves; long pointed buds',r:'fagus-sylvatica'}]},
-b13:{q:'Examine the leaves:',o:[{t:'Markedly asymmetric base; large (8–16 cm); rough sandpapery',r:'ulmus-glabra'},{t:'Heart-shaped; orange-brown hair tufts in vein axils beneath',r:'tilia-cordata'},{t:'Rounded with notched tip; near water; small woody cones',r:'alnus-glutinosa'},{t:'Round on long flattened stalk (trembles); blunt-toothed',r:'populus-tremula'},{t:'Broad elliptic, grey-woolly beneath; early silvery catkins',r:'salix-caprea'}]},
-b15:{q:'How are the flowers or fruits arranged?',o:[{t:'Long drooping racemes; black berries; bark smells unpleasant',r:'prunus-padus'},{t:'Short clusters of 2–6; red cherries; red glands on leaf stalk',r:'prunus-avium'}]}
-};
+let SP = [], GRP = [];
 
 // ================================================================
-// SMART FILTER TRAITS
+// FILTER DEFINITIONS
 // ================================================================
-const TRAITS=[
-{id:'type',label:'Tree Type',options:[
-  {id:'broadleaf',text:'Broadleaf',match:['fagus-sylvatica','quercus-robur','betula-pendula','fraxinus-excelsior','tilia-cordata','alnus-glutinosa','populus-tremula','ulmus-glabra','acer-platanoides','acer-pseudoplatanus','aesculus-hippocastanum','carpinus-betulus','sorbus-aucuparia','prunus-avium','prunus-padus','salix-caprea','crataegus-monogyna']},
-  {id:'conifer',text:'Conifer (needles)',match:['picea-abies','pinus-sylvestris','larix-decidua']}
-]},
-{id:'leaf',label:'Leaves',options:[
-  {id:'needles',text:'Needles',match:['picea-abies','pinus-sylvestris','larix-decidua']},
-  {id:'simple-lobed',text:'Simple, lobed',match:['quercus-robur','acer-platanoides','acer-pseudoplatanus','crataegus-monogyna']},
-  {id:'simple-unlobed',text:'Simple, unlobed',match:['fagus-sylvatica','betula-pendula','carpinus-betulus','ulmus-glabra','tilia-cordata','alnus-glutinosa','populus-tremula','salix-caprea','prunus-avium','prunus-padus']},
-  {id:'compound',text:'Compound (separate leaflets)',match:['fraxinus-excelsior','sorbus-aucuparia','aesculus-hippocastanum']}
-]},
-{id:'bark',label:'Bark',options:[
-  {id:'smooth',text:'Smooth grey or greenish',match:['fagus-sylvatica','populus-tremula','sorbus-aucuparia','prunus-padus']},
-  {id:'white-peeling',text:'White, peeling in strips',match:['betula-pendula']},
-  {id:'red-bands',text:'Reddish with horizontal bands',match:['prunus-avium']},
-  {id:'orange',text:'Orange-red upper trunk',match:['pinus-sylvestris']},
-  {id:'fluted',text:'Fluted, muscular ridges',match:['carpinus-betulus']},
-  {id:'flaking',text:'Flaking in large plates',match:['acer-pseudoplatanus','aesculus-hippocastanum']},
-  {id:'fissured',text:'Deeply fissured or ridged',match:['quercus-robur','fraxinus-excelsior','tilia-cordata','ulmus-glabra','alnus-glutinosa','salix-caprea','acer-platanoides','crataegus-monogyna','picea-abies','larix-decidua']}
-]},
-{id:'bud',label:'Buds (Winter)',options:[
-  {id:'black',text:'Jet black',match:['fraxinus-excelsior']},
-  {id:'sticky',text:'Large and sticky',match:['aesculus-hippocastanum']},
-  {id:'long-pointed',text:'Long, pointed, cigar-shaped',match:['fagus-sylvatica']},
-  {id:'clustered',text:'Clustered at twig tip',match:['quercus-robur']},
-  {id:'hairy',text:'Purple-grey and hairy',match:['sorbus-aucuparia']},
-  {id:'catkins',text:'Catkins visible',match:['salix-caprea','alnus-glutinosa','betula-pendula','carpinus-betulus']}
-]},
-{id:'fruit',label:'Fruit / Seeds',options:[
-  {id:'acorn',text:'Acorns',match:['quercus-robur']},
-  {id:'winged',text:'Winged seeds',match:['acer-platanoides','acer-pseudoplatanus','fraxinus-excelsior','ulmus-glabra','betula-pendula']},
-  {id:'berry',text:'Berries or small fruits',match:['sorbus-aucuparia','crataegus-monogyna','prunus-avium','prunus-padus']},
-  {id:'nut-husk',text:'Nuts in spiny husk',match:['fagus-sylvatica','aesculus-hippocastanum']},
-  {id:'cone',text:'Cones',match:['picea-abies','pinus-sylvestris','larix-decidua']},
-  {id:'woody-mini',text:'Small woody cone-like fruits',match:['alnus-glutinosa']}
-]},
-{id:'size',label:'Size',options:[
-  {id:'small',text:'Small (under 10 m)',match:['crataegus-monogyna','salix-caprea','sorbus-aucuparia']},
-  {id:'medium',text:'Medium (10–25 m)',match:['betula-pendula','alnus-glutinosa','populus-tremula','carpinus-betulus','sorbus-aucuparia','prunus-avium','prunus-padus','salix-caprea','acer-platanoides']},
-  {id:'large',text:'Large (over 25 m)',match:['fagus-sylvatica','quercus-robur','fraxinus-excelsior','tilia-cordata','ulmus-glabra','picea-abies','pinus-sylvestris','larix-decidua','acer-platanoides','acer-pseudoplatanus','aesculus-hippocastanum']}
-]},
-{id:'habitat',label:'Habitat',options:[
-  {id:'wet',text:'Near water or wet ground',match:['alnus-glutinosa','salix-caprea','prunus-padus','populus-tremula']},
-  {id:'forest',text:'Forest or woodland',match:['fagus-sylvatica','quercus-robur','fraxinus-excelsior','tilia-cordata','carpinus-betulus','ulmus-glabra','picea-abies','prunus-avium','sorbus-aucuparia']},
-  {id:'open',text:'Open ground, parks, hedgerows',match:['betula-pendula','acer-platanoides','acer-pseudoplatanus','aesculus-hippocastanum','pinus-sylvestris','larix-decidua','crataegus-monogyna']}
-]}
+const FILTERS = [
+  {id:'form',label:'Growth Form',multi:false,options:[
+    {v:'tree',t:'Tree'},{v:'small-tree',t:'Small tree'},{v:'shrub',t:'Shrub'},
+    {v:'herb',t:'Herb'},{v:'grass',t:'Grass'},{v:'fern',t:'Fern'},{v:'bulb',t:'Bulb'}]},
+  {id:'habitat',label:'Habitat',multi:true,options:[
+    {v:'woodland',t:'Woodland'},{v:'hedgerow',t:'Hedgerow'},{v:'meadow',t:'Meadow'},
+    {v:'roadside',t:'Roadside'},{v:'park',t:'Park'},{v:'wetland',t:'Wetland'},
+    {v:'heath',t:'Heathland'},{v:'coast',t:'Coast'}]},
+  {id:'leaf',label:'Leaf Type',multi:false,options:[
+    {v:'simple',t:'Simple'},{v:'simple-lobed',t:'Simple, lobed'},
+    {v:'compound-pinnate',t:'Compound pinnate'},{v:'compound-palmate',t:'Compound palmate'},
+    {v:'compound-trifoliate',t:'Trifoliate'},{v:'compound-ternate',t:'Ternate'},
+    {v:'needle',t:'Needle'},{v:'scale-like',t:'Scale-like'},{v:'frond',t:'Frond'}]},
+  {id:'leaf_arr',label:'Leaf Arrangement',multi:false,options:[
+    {v:'alternate',t:'Alternate'},{v:'opposite',t:'Opposite'},{v:'basal',t:'Basal rosette'},
+    {v:'whorled',t:'Whorled'},{v:'spiral',t:'Spiral'},{v:'pairs',t:'In pairs'},
+    {v:'clusters',t:'In clusters'},{v:'shuttlecock',t:'Shuttlecock'},{v:'single',t:'Single'}]},
+  {id:'flower_color',label:'Flower Colour',multi:false,options:[
+    {v:'white',t:'White'},{v:'yellow',t:'Yellow'},{v:'pink',t:'Pink'},{v:'purple',t:'Purple'},
+    {v:'blue',t:'Blue'},{v:'green',t:'Green'},{v:'brown',t:'Brown'},{v:'none',t:'None'}]},
+  {id:'bloom',label:'Flowering Season',multi:true,options:[
+    {v:'spring',t:'Spring'},{v:'summer',t:'Summer'},{v:'autumn',t:'Autumn'},{v:'winter',t:'Winter'}]},
+  {id:'notable',label:'Notable Features',multi:true,dynamic:true}
 ];
-
-let sfSel = {}; // { traitId: optionId }
-
-function sfMatch() {
-  const ids = SP.map(s=>s.id);
-  return ids.filter(id => {
-    for (const [traitId, optId] of Object.entries(sfSel)) {
-      const trait = TRAITS.find(t=>t.id===traitId);
-      if (!trait) continue;
-      const opt = trait.options.find(o=>o.id===optId);
-      if (!opt) continue;
-      if (!opt.match.includes(id)) return false;
-    }
-    return true;
-  });
-}
+// (SP and GRP populated from species.json at runtime)
 
 // ================================================================
 // STATE
 // ================================================================
-let view='browse',filter='all',imgC={},keyH=[];
+let view='browse',filter='all',imgC={};
+let sfSel={}, sfOpen={}, notableTags=[];
 // Sightings: array of {id, date, lat, lng, note}
 let sightings = JSON.parse(localStorage.getItem('fs-sightings')||'[]');
 // Migrate old format
@@ -529,19 +399,19 @@ async function fetchImgs(la) {
     const subcats = await fetchSubcats(name);
     const matched = {};
     for (const cat of subcats) { if (SKIP_CAT.test(cat)) continue; for (const feat of FEAT_MAP) { if (feat.kw.test(cat)&&!matched[feat.id]) { matched[feat.id]=cat; break; } } }
-    const tasks = [fetchCatFiles('Category:'+name,20)], taskLabels = ['Whole tree'];
+    const tasks = [fetchCatFiles('Category:'+name,20)], taskLabels = ['Overview'];
     for (const [fid,catTitle] of Object.entries(matched)) { const feat=FEAT_MAP.find(f=>f.id===fid); tasks.push(fetchCatFiles(catTitle,8)); taskLabels.push(feat?feat.label:fid); }
     const results = await Promise.all(tasks);
     const pool = [], usedUrl = new Set();
     for (let i=1;i<results.length;i++) for (const url of results[i]) if (!usedUrl.has(url)){usedUrl.add(url);pool.push({url,label:taskLabels[i]});}
-    for (const url of results[0]) if (!usedUrl.has(url)){usedUrl.add(url);pool.push({url,label:'Whole tree'});}
+    for (const url of results[0]) if (!usedUrl.has(url)){usedUrl.add(url);pool.push({url,label:'Overview'});}
     if (!pool.length) throw 0;
     const selected=[],usedLabels=new Set(),MAX=12;
-    for (const item of pool){if(selected.length>=MAX)break;if(item.label!=='Whole tree'&&!usedLabels.has(item.label)){selected.push(item);usedLabels.add(item.label);}}
+    for (const item of pool){if(selected.length>=MAX)break;if(item.label!=='Overview'&&!usedLabels.has(item.label)){selected.push(item);usedLabels.add(item.label);}}
     const usedS=new Set(selected.map(s=>s.url));
-    for (const item of pool){if(selected.length>=MAX)break;if(item.label!=='Whole tree'&&!usedS.has(item.url)){selected.push(item);usedS.add(item.url);}}
+    for (const item of pool){if(selected.length>=MAX)break;if(item.label!=='Overview'&&!usedS.has(item.url)){selected.push(item);usedS.add(item.url);}}
     for (const item of pool){if(selected.length>=MAX)break;if(!usedS.has(item.url)){selected.push(item);usedS.add(item.url);}}
-    const htIdx=selected.findIndex(s=>s.label==='Whole tree');
+    const htIdx=selected.findIndex(s=>s.label==='Overview');
     if(htIdx>0){const[ht]=selected.splice(htIdx,1);selected.unshift(ht);}
     imgC[la]=selected; return selected;
   } catch(e) {
@@ -572,7 +442,7 @@ function go(v, pushState=true) {
   document.getElementById('det').classList.remove('on');
   if(v==='fieldlog') renderML();
   if(v==='browse') renderGrid();
-  if(v==='identify') setIdMode(idMode);
+  if(v==='identify') renderSF();
   window.scrollTo(0,0);
   if(pushState) history.pushState({view:v},'','#'+v);
 }
@@ -588,8 +458,6 @@ window.addEventListener('popstate', e => {
     closeMapModal();
     closeLb();
     go(state.view, false);
-    // Restore key state if identify
-    if(state.view==='identify'&&state.keyH) { keyH=state.keyH; renderK(keyH[keyH.length-1]); }
     return;
   }
   go('browse',false);
@@ -598,10 +466,19 @@ window.addEventListener('popstate', e => {
 // ================================================================
 // BROWSE
 // ================================================================
+const imgObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      loadCardImg(e.target, e.target.dataset.la);
+      imgObserver.unobserve(e.target);
+    }
+  });
+}, {rootMargin:'200px'});
+
 function renderPills() {
   document.getElementById('pills').innerHTML =
     '<button class="pill on" onclick="setF(\'all\',this)">All</button>' +
-    GRP.map(g=>'<button class="pill" onclick="setF(\''+g.id+'\',this)">'+g.name+'</button>').join('');
+    GRP.map(g=>'<button class="pill" onclick="setF(\''+g.id+'\',this)">'+(g.icon?g.icon+' ':'')+g.name+'</button>').join('');
 }
 function setF(f,btn) { filter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));btn.classList.add('on');renderGrid(); }
 function renderGrid() {
@@ -610,10 +487,21 @@ function renderGrid() {
     const ck=seenIds.includes(s.id);
     return '<div class="card" onclick="openDet(\''+s.id+'\')">'+
       (ck?'<div class="card-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>':'')+
-      '<div class="card-img" id="ci-'+s.id+'"><div class="skel"></div></div>'+
+      '<div class="card-img" data-la="'+s.la+'" id="ci-'+s.id+'"><div class="skel"></div></div>'+
       '<div class="card-txt"><div class="card-nm">'+s.en+'</div><div class="card-la">'+s.la+'</div></div></div>';
   }).join('');
-  list.forEach(s=>{const e=document.getElementById('ci-'+s.id);if(e) loadCardImg(e,s.la);});
+  list.forEach(s=>{const e=document.getElementById('ci-'+s.id);if(e) imgObserver.observe(e);});
+}
+function renderCardGrid(containerId, list) {
+  const el=document.getElementById(containerId), seenIds=getSeenIds();
+  el.innerHTML = list.map(s => {
+    const ck=seenIds.includes(s.id);
+    return '<div class="card" onclick="openDet(\''+s.id+'\')">'+
+      (ck?'<div class="card-ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>':'')+
+      '<div class="card-img" data-la="'+s.la+'" id="sfci-'+s.id+'"><div class="skel"></div></div>'+
+      '<div class="card-txt"><div class="card-nm">'+s.en+'</div><div class="card-la">'+s.la+'</div></div></div>';
+  }).join('');
+  list.forEach(s=>{const e=document.getElementById('sfci-'+s.id);if(e) imgObserver.observe(e);});
 }
 
 // ================================================================
@@ -621,7 +509,7 @@ function renderGrid() {
 // ================================================================
 function openDet(id, pushState=true) {
   const s=SP.find(x=>x.id===id);if(!s)return;
-  const g=GRP.find(x=>x.id===s.g), sl=getSightingsFor(s.id), count=sl.length;
+  const g=GRP.find(x=>x.id===s.g)||{name:'',fg:'#666',bg:'#eee'}, sl=getSightingsFor(s.id), count=sl.length;
   let h = '<div class="car"><div class="car-t" id="ct-'+s.id+'" onscroll="onCS(\''+s.id+'\')"><div class="car-s"><div class="skel"></div></div></div><div class="car-d" id="cd-'+s.id+'"></div></div>'+
     '<div class="det-b"><div class="det-g" style="color:'+g.fg+';background:'+g.bg+'">'+g.name+'</div>'+
     '<h1 class="det-en">'+s.en+'</h1><p class="det-la">'+s.la+'</p>'+
@@ -630,7 +518,13 @@ function openDet(id, pushState=true) {
       '<button class="spot-btn spot-primary" onclick="openSightModal(\''+s.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'+(count?'Log Another Sighting':'Log Sighting')+'</button>'+
       (count?'<div class="spot-count"><strong>'+count+'</strong> sighting'+(count>1?'s':'')+' recorded</div>':'')+
     '</div>'+
-    '<div class="det-m"><div class="meta"><div class="meta-l">Height</div><div class="meta-v">'+s.ht+'</div></div><div class="meta"><div class="meta-l">Lifespan</div><div class="meta-v">'+s.life+'</div></div></div>';
+    (function(){
+      const mi=[];
+      if(s.ht)mi.push({l:'Height',v:s.ht});
+      if(s.life)mi.push({l:'Lifespan',v:s.life});
+      if(!mi.length)return '';
+      return '<div class="det-m"'+(mi.length===1?' style="grid-template-columns:1fr"':'')+'>'+mi.map(m=>'<div class="meta"><div class="meta-l">'+m.l+'</div><div class="meta-v">'+m.v+'</div></div>').join('')+'</div>';
+    })();
 
   // Show sightings if any
   if(count) {
@@ -772,7 +666,7 @@ function updB() {
 // FIELD LOG
 // ================================================================
 function renderML() {
-  const el=document.getElementById('mlc'),seenIds=getSeenIds(),n=seenIds.length,pct=(n/SP.length*100).toFixed(0);
+  const el=document.getElementById('mlc'),seenIds=getSeenIds(),n=seenIds.length,total=SP.length||1,pct=(n/total*100).toFixed(0);
   let h = '<div style="padding:8px 20px 0"><div class="mc">'+n+'<small> / '+SP.length+' species spotted</small></div></div><div class="pw"><div class="pf" style="width:'+pct+'%"></div></div><p class="mhn">'+(n===0?'Log your first sighting to start tracking.':n===SP.length?"You've spotted them all!":(SP.length-n)+' more to find.')+'</p>';
   if(sightings.length && sightings.some(s=>s.lat)) {
     h += '<button class="map-all-btn" onclick="openMapModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>View All on Map</button>';
@@ -841,229 +735,133 @@ function closeMapModal() {
 // ================================================================
 // SMART FILTER
 // ================================================================
-let idMode = 'filter';
-let sfOpen = {};  // which categories are expanded
-
-function setIdMode(mode) {
-  idMode = mode;
-  document.querySelectorAll('.sf-tab').forEach((t,i)=>t.classList.toggle('on', (i===0&&mode==='filter')||(i===1&&mode==='key')));
-  document.getElementById('sf-content').style.display = mode==='filter'?'block':'none';
-  document.getElementById('idc').style.display = mode==='key'?'block':'none';
-  document.getElementById('sf-bar').style.display = 'none';
-  if (mode==='filter') renderSF();
+function computeNotableTags() {
+  const counts={};
+  for(const s of SP) for(const tag of (s.filter.notable||[])) counts[tag]=(counts[tag]||0)+1;
+  notableTags=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,25).map(([tag])=>({v:tag,t:tag}));
 }
 
-function renderSF() {
-  const matches = sfMatch();
-  const nSel = Object.keys(sfSel).length;
-  const el = document.getElementById('sf-content');
-  let h = '<div class="sf-wrap">';
-  h += '<p class="sf-intro">Select what you can observe — skip anything you can\'t see.</p>';
-  for (const trait of TRAITS) {
-    const isOpen = sfOpen[trait.id];
-    const selOpt = sfSel[trait.id];
-    const selText = selOpt ? trait.options.find(o=>o.id===selOpt)?.text : null;
-    h += '<div class="sf-cat'+(isOpen?' open':'')+'">';
-    h += '<div class="sf-cat-head" onclick="sfToggleCat(\''+trait.id+'\')">';
-    h += '<span class="sf-cat-label">'+trait.label+'</span>';
-    h += '<span style="display:flex;align-items:center;gap:8px">';
-    if (selText) {
-      h += '<span class="sf-cat-sel">'+selText+'</span>';
-      h += '<button class="sf-cat-clear" onclick="event.stopPropagation();sfClear(\''+trait.id+'\')">Clear</button>';
+function sfMatch() {
+  return SP.filter(s=>{
+    const f=s.filter;
+    for(const [key,val] of Object.entries(sfSel)){
+      if(val===null||val===undefined) continue;
+      if(Array.isArray(val)&&val.length===0) continue;
+      const fv=f[key];
+      if(Array.isArray(val)){
+        if(Array.isArray(fv)){if(!val.some(v=>fv.includes(v)))return false;}
+        else{if(!val.includes(fv))return false;}
+      }else{
+        if(Array.isArray(fv)){if(!fv.includes(val))return false;}
+        else{if(fv!==val)return false;}
+      }
     }
-    h += '<svg class="sf-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    h += '</span></div>';
-    h += '<div class="sf-cat-body"><div class="sf-opts">';
-    for (const opt of trait.options) {
-      const active = sfSel[trait.id]===opt.id;
-      const count = opt.match.filter(id=>matches.includes(id)).length;
-      h += '<button class="sf-opt'+(active?' on':'')+'" onclick="sfPick(\''+trait.id+'\',\''+opt.id+'\')">'+opt.text+(!active&&nSel?' ('+count+')':'')+'</button>';
+    return true;
+  });
+}
+
+function sfMatchWithout(catId) {
+  return SP.filter(s=>{
+    const f=s.filter;
+    for(const [key,val] of Object.entries(sfSel)){
+      if(key===catId) continue;
+      if(val===null||val===undefined) continue;
+      if(Array.isArray(val)&&val.length===0) continue;
+      const fv=f[key];
+      if(Array.isArray(val)){
+        if(Array.isArray(fv)){if(!val.some(v=>fv.includes(v)))return false;}
+        else{if(!val.includes(fv))return false;}
+      }else{
+        if(Array.isArray(fv)){if(!fv.includes(val))return false;}
+        else{if(fv!==val)return false;}
+      }
     }
-    h += '</div></div></div>';
+    return true;
+  });
+}
+
+function sfHasSelections(){
+  for(const v of Object.values(sfSel)){
+    if(Array.isArray(v)&&v.length>0)return true;
+    if(!Array.isArray(v)&&v!=null)return true;
   }
-  h += '</div>';
-  el.innerHTML = h;
-  renderSFBar(matches);
+  return false;
 }
 
-function sfToggleCat(id) { sfOpen[id]=!sfOpen[id]; renderSF(); }
+function sfSelText(cat){
+  const v=sfSel[cat.id];
+  if(!v||(Array.isArray(v)&&!v.length))return null;
+  if(Array.isArray(v)){
+    const opts=cat.dynamic?notableTags:cat.options;
+    return v.map(val=>{const o=opts.find(o=>o.v===val);return o?o.t:val;}).join(', ');
+  }
+  const o=cat.options.find(o=>o.v===v);
+  return o?o.t:v;
+}
 
-function sfPick(traitId, optId) {
-  if (sfSel[traitId]===optId) delete sfSel[traitId]; else sfSel[traitId]=optId;
+function renderSF(){
+  const matches=sfMatch();
+  const hasSel=sfHasSelections();
+  const el=document.getElementById('sf-content');
+  const mb=document.getElementById('sf-match');
+  if(hasSel){
+    mb.innerHTML='<div class="sf-match-bar"><span class="sf-match-count"><strong>'+matches.length+'</strong> of '+SP.length+' species match</span><button class="sf-match-reset" onclick="sfReset()">Clear all</button></div>';
+  }else{
+    mb.innerHTML='';
+  }
+  let h='<div class="sf-wrap">';
+  if(!hasSel) h+='<p class="sf-intro">Select what you can observe to narrow down species.</p>';
+  for(const cat of FILTERS){
+    const opts=cat.dynamic?notableTags:cat.options;
+    if(!opts||!opts.length) continue;
+    const isOpen=sfOpen[cat.id];
+    const selText=sfSelText(cat);
+    const baseMatches=sfMatchWithout(cat.id);
+    h+='<div class="sf-cat'+(isOpen?' open':'')+'">';
+    h+='<div class="sf-cat-head" onclick="sfToggleCat(\''+cat.id+'\')">';
+    h+='<span class="sf-cat-label">'+cat.label+'</span>';
+    h+='<span style="display:flex;align-items:center;gap:8px">';
+    if(selText) h+='<span class="sf-cat-sel">'+selText+'</span><button class="sf-cat-clear" onclick="event.stopPropagation();sfClear(\''+cat.id+'\')">Clear</button>';
+    h+='<svg class="sf-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    h+='</span></div>';
+    h+='<div class="sf-cat-body"><div class="sf-opts">';
+    for(const opt of opts){
+      const isActive=cat.multi?(sfSel[cat.id]||[]).includes(opt.v):sfSel[cat.id]===opt.v;
+      const count=baseMatches.filter(s=>{
+        const fv=s.filter[cat.id];
+        if(Array.isArray(fv))return fv.includes(opt.v);
+        return fv===opt.v;
+      }).length;
+      const dim=!isActive&&hasSel&&count===0;
+      h+='<button class="sf-opt'+(isActive?' on':'')+(dim?' dim':'')+'" onclick="sfPick(\''+cat.id+"','"+opt.v+"',"+cat.multi+')">'+opt.t+((!isActive&&hasSel&&!dim)?'<span class="ct">'+count+'</span>':'')+'</button>';
+    }
+    h+='</div></div></div>';
+  }
+  h+='</div>';
+  el.innerHTML=h;
+  // Render result grid
+  if(hasSel) renderCardGrid('sf-grid',matches);
+  else document.getElementById('sf-grid').innerHTML='';
+}
+
+function sfToggleCat(id){sfOpen[id]=!sfOpen[id];renderSF();}
+
+function sfPick(catId,val,multi){
+  if(multi){
+    if(!sfSel[catId])sfSel[catId]=[];
+    const idx=sfSel[catId].indexOf(val);
+    if(idx>=0)sfSel[catId].splice(idx,1);
+    else sfSel[catId].push(val);
+    if(!sfSel[catId].length)delete sfSel[catId];
+  }else{
+    if(sfSel[catId]===val)delete sfSel[catId];
+    else sfSel[catId]=val;
+  }
   renderSF();
 }
 
-function sfClear(traitId) { delete sfSel[traitId]; renderSF(); }
-
-function sfReset() { sfSel={}; renderSF(); }
-
-function renderSFBar(matches) {
-  const bar = document.getElementById('sf-bar');
-  const nSel = Object.keys(sfSel).length;
-  if (!nSel) { bar.classList.remove('on'); return; }
-  bar.classList.add('on');
-  let h = '<div class="sf-bar-top"><span class="sf-bar-count"><strong>'+matches.length+'</strong> species match'+(matches.length===1?'es':'')+'</span>';
-  h += '<button class="sf-bar-reset" onclick="sfReset()">Reset all</button></div>';
-  if (matches.length>0 && matches.length<=8) {
-    h += '<div class="sf-results">';
-    for (const id of matches) {
-      const s = SP.find(x=>x.id===id);
-      if (!s) continue;
-      h += '<div class="sf-rcard" onclick="openDet(\''+s.id+'\')">';
-      h += '<div class="sf-rimg" id="sfr-'+s.id+'"><div class="skel" style="width:100%;height:100%"></div></div>';
-      h += '<div class="sf-rname">'+s.en+'</div><div class="sf-rla">'+s.la+'</div></div>';
-    }
-    h += '</div>';
-    // If 2–3 matches, show distinguishing tips
-    if (matches.length<=3 && matches.length>=2) {
-      h += renderSFTips(matches);
-    }
-  }
-  bar.innerHTML = h;
-  // Load result card images
-  if (matches.length<=8) {
-    matches.forEach(id=>{
-      const s=SP.find(x=>x.id===id);
-      if(!s)return;
-      const e=document.getElementById('sfr-'+s.id);
-      if(e) loadCardImg(e,s.la);
-    });
-  }
-}
-
-function renderSFTips(matchIds) {
-  let h = '';
-  const species = matchIds.map(id=>SP.find(x=>x.id===id)).filter(Boolean);
-  for (const s of species) {
-    if (!s.conf) continue;
-    for (const c of s.conf) {
-      const other = species.find(o=>c.sp.toLowerCase().includes(o.la.toLowerCase()));
-      if (other) {
-        h += '<div class="sf-conf"><div class="sf-conf-title">How to tell apart</div>';
-        h += '<div class="sf-conf-tip"><span class="sf-conf-sp">'+s.en+'</span> vs <span class="sf-conf-sp">'+other.en+'</span>: '+c.d+'</div></div>';
-        return h; // one tip is enough
-      }
-    }
-  }
-  return h;
-}
-
-// ================================================================
-// IDENTIFY — Visual Decision Tree
-// ================================================================
-function startKey() {
-  keyH = [{step:'start',answer:null}];
-  renderTree();
-  history.pushState({view:'identify',keyH:keyH.map(k=>k.step)},'','#identify/start');
-}
-
-function renderTree() {
-  const el = document.getElementById('idc');
-  const current = keyH[keyH.length-1];
-  const k = KEY[current.step];
-  if (!k) return;
-
-  let html = '<div class="tree-wrap">';
-  html += '<button class="tree-restart" onclick="go(\'identify\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2"><path d="M1 4v6h6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 105.64-9.14L1 10" stroke-linecap="round" stroke-linejoin="round"/></svg>Start Over</button>';
-
-  // Render answered steps
-  for (let i = 0; i < keyH.length - 1; i++) {
-    const step = keyH[i];
-    const kk = KEY[step.step];
-    if (!kk) continue;
-    html += '<div class="tree-step">';
-    html += '<div class="tree-dot"></div>';
-    html += '<div class="tree-step-q">' + kk.q + '</div>';
-    html += '<div class="tree-step-a">' + step.answer + '</div>';
-    html += '</div>';
-  }
-
-  // Render current question with branch options
-  html += '<div class="tree-current">';
-  html += '<div class="tree-dot"></div>';
-  html += '<div class="tree-q">' + k.q + '</div>';
-
-  const optCount = k.o.length;
-  html += '<div class="tree-options' + (optCount === 2 ? ' binary' : '') + '">';
-  k.o.forEach(o => {
-    if (o.r) {
-      html += '<button class="tree-opt" onclick="keyResult(\'' + o.r + '\',\'' + esc(o.t) + '\')">' + o.t + '</button>';
-    } else {
-      html += '<button class="tree-opt" onclick="keyAnswer(\'' + o.n + '\',\'' + esc(o.t) + '\')">' + o.t + '</button>';
-    }
-  });
-  html += '</div></div></div>';
-
-  el.innerHTML = html;
-  // Scroll to current question
-  setTimeout(() => {
-    const cur = el.querySelector('.tree-current');
-    if (cur) cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 100);
-}
-
-function esc(s) { return s.replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
-
-function keyAnswer(nextStep, answerText) {
-  keyH[keyH.length-1].answer = answerText;
-  keyH.push({step: nextStep, answer: null});
-  renderTree();
-  history.pushState({view:'identify',keyH:keyH.map(k=>k.step)},'','#identify/'+nextStep);
-}
-
-function keyResult(speciesId, answerText) {
-  keyH[keyH.length-1].answer = answerText;
-  const s = SP.find(x => x.id === speciesId);
-  if (!s) return;
-  const el = document.getElementById('idc');
-
-  let html = '<div class="tree-wrap">';
-  html += '<button class="tree-restart" onclick="go(\'identify\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2"><path d="M1 4v6h6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 15a9 9 0 105.64-9.14L1 10" stroke-linecap="round" stroke-linejoin="round"/></svg>Start Over</button>';
-
-  // All answered steps
-  for (let i = 0; i < keyH.length; i++) {
-    const step = keyH[i];
-    const kk = KEY[step.step];
-    if (!kk) continue;
-    html += '<div class="tree-step">';
-    html += '<div class="tree-dot"></div>';
-    html += '<div class="tree-step-q">' + kk.q + '</div>';
-    html += '<div class="tree-step-a">' + (step.answer||'') + '</div>';
-    html += '</div>';
-  }
-
-  // Result
-  html += '<div class="tree-result"><div class="tree-dot"></div>';
-  html += '<div class="kr"><p class="kr-l">Your tree is likely</p><h2 class="kr-n">' + s.en + '</h2><p class="kr-la">' + s.la + '</p>';
-  html += '<div class="kri" id="kri"><div class="skel" style="width:100%;height:100%;border-radius:50%"></div></div>';
-  html += '<div class="kr-btns"><button class="bp" onclick="openDet(\'' + s.id + '\')">View Profile</button><button class="bs" onclick="startKey()">Try Again</button></div>';
-  html += '</div></div></div>';
-
-  el.innerHTML = html;
-
-  fetchImgs(s.la).then(imgs => {
-    const e = document.getElementById('kri');
-    if (!imgs.length) { e.innerHTML = '<div class="ph">' + s.la + '</div>'; return; }
-    const img = new Image(); img.alt = s.la;
-    img.onload = () => { e.querySelector('.skel')?.remove(); e.appendChild(img); };
-    img.onerror = () => { e.innerHTML = '<div class="ph">' + s.la + '</div>'; };
-    img.src = imgs[0].url;
-  });
-
-  // Scroll to result
-  setTimeout(() => {
-    const res = el.querySelector('.tree-result');
-    if (res) res.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 100);
-}
-
-// Back navigation in tree
-function renderK(step) {
-  // Rebuild keyH to match step
-  const idx = keyH.findIndex(k=>k.step===step);
-  if(idx>=0) { keyH=keyH.slice(0,idx+1); keyH[keyH.length-1].answer=null; }
-  renderTree();
-}
+function sfClear(catId){delete sfSel[catId];renderSF();}
+function sfReset(){sfSel={};renderSF();}
 
 // ================================================================
 // LIGHTBOX — fullscreen image viewer with pinch-to-zoom
@@ -1163,14 +961,34 @@ function lbUpdateTransform() {
 })();
 
 // ================================================================
+// LOAD SPECIES DATA
+// ================================================================
+async function loadSpecies(){
+  try{
+    const r=await fetch('species.json');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const data=await r.json();
+    GRP=data.groups||[];
+    SP=data.species||[];
+    computeNotableTags();
+    document.getElementById('bsub').textContent=SP.length+' common plants of Zealand';
+    renderPills();
+    renderGrid();
+    updB();
+  }catch(e){
+    document.getElementById('grid').innerHTML='<div class="loading"><p>Failed to load species data. Please refresh.</p></div>';
+  }
+}
+
+// ================================================================
 // INIT
 // ================================================================
-renderPills(); renderGrid(); updB();
-// Set initial history state
+loadSpecies();
+updB();
 history.replaceState({view:'browse'},'','#browse');
 
 if ('serviceWorker' in navigator) {
-  const sw = "const C='flora-v5';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.open(C).then(c=>caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))).then(()=>clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}return r;}).catch(()=>c);return c||f;}));});";
+  const sw = "const C='flora-v6';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.open(C).then(c=>caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))).then(()=>clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}return r;}).catch(()=>c);return c||f;}));});";
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], {type: 'application/javascript'}))).catch(() => {});
 }
 </script>
