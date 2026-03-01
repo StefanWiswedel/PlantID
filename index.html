@@ -47,7 +47,23 @@ img{display:block;max-width:100%}
 .bsub{color:rgba(255,255,255,.6);font-size:.82rem;margin-top:8px;font-weight:300}
 .bh-link{display:inline-flex;align-items:center;gap:5px;margin-top:12px;padding:6px 14px;border-radius:100px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:.72rem;font-weight:500;text-decoration:none;backdrop-filter:blur(4px);transition:all .15s}
 .bh-link:active{background:rgba(255,255,255,.2)}
-.pills{display:flex;gap:8px;padding:18px 20px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+/* Search */
+.search-wrap{position:relative;padding:14px 20px 0}
+.search-input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid var(--bd);border-radius:100px;font-family:inherit;font-size:.86rem;background:var(--sf);color:var(--tx);transition:border-color .15s;outline:none}
+.search-input:focus{border-color:var(--ac)}
+.search-input::placeholder{color:var(--tx3)}
+.search-icon{position:absolute;left:34px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--tx3);pointer-events:none}
+.search-clear{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:24px;height:24px;display:none;align-items:center;justify-content:center;color:var(--tx3);border-radius:50%}
+.search-clear:active{background:rgba(0,0,0,.06)}
+.search-results{position:absolute;left:20px;right:20px;top:100%;z-index:100;background:var(--sf);border-radius:var(--rad);box-shadow:0 4px 20px rgba(0,0,0,.12);max-height:320px;overflow-y:auto;display:none}
+.search-results.on{display:block}
+.search-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:background .1s}
+.search-item:active,.search-item:hover{background:rgba(0,0,0,.03)}
+.search-item-name{font-size:.86rem;font-weight:500}
+.search-item-la{font-size:.74rem;color:var(--tx2);font-style:italic;font-weight:300}
+.search-item-grp{font-size:.62rem;color:var(--tx3);margin-left:auto;flex-shrink:0}
+
+.pills{display:flex;gap:8px;padding:14px 20px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .pills::-webkit-scrollbar{display:none}
 .pill{flex-shrink:0;padding:8px 16px;border-radius:100px;font-size:.78rem;font-weight:500;background:transparent;color:var(--tx2);border:1.5px solid rgba(0,0,0,.08);transition:all .15s;white-space:nowrap}
 .pill.on{background:var(--ac);color:#fff;border-color:var(--ac)}
@@ -238,6 +254,18 @@ img{display:block;max-width:100%}
 <div id="app">
   <div class="v on" id="v-browse">
     <div class="bh"><div class="logo">Flora <i>Sjælland</i></div><p class="bsub" id="bsub">Common plants of Zealand</p><a class="bh-link" href="curator.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Curate Images</a></div>
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+      <input type="text" class="search-input" id="search-input" placeholder="Search by name..." autocomplete="off" oninput="onSearch()" onfocus="onSearch()">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+      <input class="search-input" id="search-input" type="text" placeholder="Search by name..." autocomplete="off">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
+      <div class="search-results" id="search-results"></div>
+    </div>
     <div class="pills" id="pills"></div>
     <div class="grid" id="grid"><div class="loading"><div class="spinner"></div><p>Loading species...</p></div></div>
   </div>
@@ -349,6 +377,7 @@ if (_oldSeen.length && !sightings.length) {
 function getSeenIds(){ return [...new Set(sightings.map(s=>s.id))]; }
 function getSightingsFor(id){ return sightings.filter(s=>s.id===id); }
 let sightModalSpecies = null;
+let sightEditIdx = -1; // index into main sightings array; -1 = new
 let sightMap = null, sightMarker = null, fullMap = null;
 
 // ================================================================
@@ -505,6 +534,47 @@ function renderCardGrid(containerId, list) {
 }
 
 // ================================================================
+// SEARCH
+// ================================================================
+(function(){
+  const inp=document.getElementById('search-input');
+  const res=document.getElementById('search-results');
+  const clr=document.getElementById('search-clear');
+  inp.addEventListener('input',()=>{
+    const q=inp.value.trim().toLowerCase();
+    clr.style.display=q?'flex':'none';
+    if(!q||q.length<1){res.classList.remove('on');return;}
+    const matches=SP.filter(s=>
+      s.en.toLowerCase().includes(q)||
+      s.la.toLowerCase().includes(q)||
+      (s.da&&s.da.toLowerCase().includes(q))
+    ).slice(0,12);
+    if(!matches.length){res.innerHTML='<div style="padding:14px 16px;color:var(--tx2);font-size:.84rem">No matches</div>';res.classList.add('on');return;}
+    res.innerHTML=matches.map(s=>{
+      const g=GRP.find(x=>x.id===s.g);
+      return '<div class="search-item" onmousedown="openDet(\''+s.id+'\');clearSearch()">'+
+        '<div><div class="search-item-name">'+highlight(s.en,q)+'</div><div class="search-item-la">'+highlight(s.la,q)+(s.da?' · '+highlight(s.da,q):'')+'</div></div>'+
+        (g?'<span class="search-item-grp">'+g.name+'</span>':'')+
+        '</div>';
+    }).join('');
+    res.classList.add('on');
+  });
+  inp.addEventListener('blur',()=>{setTimeout(()=>res.classList.remove('on'),200);});
+  inp.addEventListener('focus',()=>{if(inp.value.trim())inp.dispatchEvent(new Event('input'));});
+})();
+function highlight(text,q){
+  const i=text.toLowerCase().indexOf(q);
+  if(i<0)return text;
+  return text.slice(0,i)+'<mark style="background:var(--acl);color:var(--ac);border-radius:2px;padding:0 1px">'+text.slice(i,i+q.length)+'</mark>'+text.slice(i+q.length);
+}
+function clearSearch(){
+  const inp=document.getElementById('search-input');
+  inp.value='';
+  document.getElementById('search-clear').style.display='none';
+  document.getElementById('search-results').classList.remove('on');
+}
+
+// ================================================================
 // DETAIL
 // ================================================================
 function openDet(id, pushState=true) {
@@ -539,7 +609,10 @@ function openDet(id, pushState=true) {
         '<div class="sight-info"><div class="sight-date">'+dateStr+' at '+timeStr+'</div><div class="sight-loc">'+locStr+'</div>'+
         (sg.note?'<div class="sight-note">'+sg.note+'</div>':'')+
         '</div>'+
-        '<button class="sight-del" onclick="event.stopPropagation();delSighting(\''+s.id+'\','+i+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>'+
+        '<div style="display:flex;gap:4px;flex-shrink:0">'+
+        '<button class="sight-del" onclick="event.stopPropagation();editSighting(\''+s.id+'\','+i+')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+        '<button class="sight-del" onclick="event.stopPropagation();delSighting(\''+s.id+'\','+i+')" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>'+
+        '</div>'+
         '</div>';
     });
     h += '</div></div>';
@@ -593,26 +666,39 @@ function closeDet() {
 // ================================================================
 // SIGHTINGS
 // ================================================================
-function openSightModal(id) {
+function openSightModal(id, editMainIdx) {
   sightModalSpecies = id;
+  sightEditIdx = (editMainIdx !== undefined) ? editMainIdx : -1;
+  const isEdit = sightEditIdx >= 0;
+  const existing = isEdit ? sightings[sightEditIdx] : null;
   const modal = document.getElementById('sight-modal');
   modal.classList.add('on');
-  // Set current date/time
-  const now = new Date();
+  document.querySelector('#sight-modal .modal-title').textContent = isEdit ? 'Edit Sighting' : 'Log Sighting';
+  document.getElementById('sight-save').textContent = isEdit ? 'Update Sighting' : 'Save Sighting';
+  // Set date/time
   const dt = document.getElementById('sight-dt');
-  dt.value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'T'+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('sight-note').value = '';
+  if (isEdit && existing.date) {
+    const d = new Date(existing.date);
+    dt.value = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  } else {
+    const now = new Date();
+    dt.value = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'T'+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  }
+  document.getElementById('sight-note').value = (isEdit && existing.note) ? existing.note : '';
   history.pushState({view:view,modal:'sight'},'','#sighting');
   // Init map after modal is visible
+  const initLat = (isEdit && existing.lat) ? existing.lat : 55.676;
+  const initLng = (isEdit && existing.lng) ? existing.lng : 12.568;
+  const initZoom = (isEdit && existing.lat) ? 15 : 13;
   setTimeout(()=>{
     if(sightMap){sightMap.remove();sightMap=null;}
     const mapEl = document.getElementById('sight-map');
-    sightMap = L.map(mapEl,{zoomControl:false}).setView([55.676,12.568],13);
+    sightMap = L.map(mapEl,{zoomControl:false}).setView([initLat,initLng],initZoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(sightMap);
     L.control.zoom({position:'topright'}).addTo(sightMap);
-    sightMarker = L.marker([55.676,12.568],{draggable:true}).addTo(sightMap);
-    // Try GPS
-    if(navigator.geolocation) {
+    sightMarker = L.marker([initLat,initLng],{draggable:true}).addTo(sightMap);
+    // Try GPS only for new sightings without existing location
+    if(!isEdit && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(pos=>{
         const ll=[pos.coords.latitude,pos.coords.longitude];
         sightMap.setView(ll,15);
@@ -632,20 +718,34 @@ function saveSighting() {
   const dt = document.getElementById('sight-dt').value;
   const note = document.getElementById('sight-note').value.trim();
   const ll = sightMarker ? sightMarker.getLatLng() : null;
-  sightings.push({
+  const entry = {
     id: sightModalSpecies,
     date: dt ? new Date(dt).toISOString() : new Date().toISOString(),
     lat: ll ? ll.lat : null,
     lng: ll ? ll.lng : null,
     note: note
-  });
+  };
+  if (sightEditIdx >= 0) {
+    sightings[sightEditIdx] = entry;
+  } else {
+    sightings.push(entry);
+  }
   localStorage.setItem('fs-sightings', JSON.stringify(sightings));
+  const reopenId = sightModalSpecies;
   closeSightModal();
   updB();
-  // Re-open detail to show updated sightings
-  openDet(sightModalSpecies || sightings[sightings.length-1].id, false);
+  openDet(reopenId, false);
+}
+function editSighting(speciesId, sortedIdx) {
+  const sl = getSightingsFor(speciesId).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const target = sl[sortedIdx];
+  if(!target) return;
+  const mainIdx = sightings.indexOf(target);
+  if(mainIdx<0) return;
+  openSightModal(speciesId, mainIdx);
 }
 function delSighting(speciesId, sortedIdx) {
+  if(!confirm('Delete this sighting?')) return;
   // Get sightings for species sorted by date desc (same order as display)
   const sl = getSightingsFor(speciesId).sort((a,b)=>new Date(b.date)-new Date(a.date));
   const target = sl[sortedIdx];
