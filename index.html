@@ -417,7 +417,7 @@ async function fetchImgs(la) {
   if (imgC[la]) return imgC[la];
   await curatedReady;
   if (curatedImages && curatedImages[la] && curatedImages[la].length > 0) { imgC[la]=curatedImages[la]; return imgC[la]; }
-  const name = la.replace(/ /g,'_');
+  const name = la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');
   try {
     const subcats = await fetchSubcats(name);
     const matched = {};
@@ -438,7 +438,7 @@ async function fetchImgs(la) {
     if(htIdx>0){const[ht]=selected.splice(htIdx,1);selected.unshift(ht);}
     imgC[la]=selected; return selected;
   } catch(e) {
-    try { const t=la.replace(/ /g,'_');const r=await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(t)+'&prop=pageimages&format=json&pithumbsize=800&origin=*');const d=await r.json();const p=Object.values(d.query.pages)[0];if(p&&p.thumbnail&&p.thumbnail.source){const res=[{url:p.thumbnail.source,label:''}];imgC[la]=res;return res;}} catch(e2){}
+    try { const t=la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');const r=await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(t)+'&prop=pageimages&format=json&pithumbsize=800&origin=*');const d=await r.json();const p=Object.values(d.query.pages)[0];if(p&&p.thumbnail&&p.thumbnail.source){const res=[{url:p.thumbnail.source,label:''}];imgC[la]=res;return res;}} catch(e2){}
     imgC[la]=[]; return [];
   }
 }
