@@ -461,12 +461,15 @@ async function fetchCatFiles(catTitle, limit) {
   if (!d.query||!d.query.pages) return [];
   return Object.values(d.query.pages).filter(p=>p.imageinfo&&p.imageinfo[0]&&p.imageinfo[0].thumburl).filter(p=>/\.(jpg|jpeg|png)$/i.test(p.title||'')).filter(p=>!SKIP_FILE.test(p.title||'')).map(p=>p.imageinfo[0].thumburl);
 }
+// Taxonomic synonyms: species whose Wikimedia Commons category uses a different name
+const WIKI_SYNONYMS = {'Chorthippus_parallelus':'Pseudochorthippus_parallelus'};
 async function fetchImgs(la) {
   if (imgC[la]) return imgC[la];
   await curatedReady;
   const allCurated = Object.assign({}, curatedImages||{}, curatedImagesFauna||{});
   if (allCurated[la] && allCurated[la].length > 0) { imgC[la]=allCurated[la]; return imgC[la]; }
-  const name = la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');
+  let name = la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');
+  if (WIKI_SYNONYMS[name]) name = WIKI_SYNONYMS[name];
   try {
     const subcats = await fetchSubcats(name);
     const matched = {};
@@ -487,7 +490,7 @@ async function fetchImgs(la) {
     if(htIdx>0){const[ht]=selected.splice(htIdx,1);selected.unshift(ht);}
     imgC[la]=selected; return selected;
   } catch(e) {
-    try { const t=la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');const r=await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(t)+'&prop=pageimages&format=json&pithumbsize=800&origin=*');const d=await r.json();const p=Object.values(d.query.pages)[0];if(p&&p.thumbnail&&p.thumbnail.source){const res=[{url:p.thumbnail.source,label:''}];imgC[la]=res;return res;}} catch(e2){}
+    try { let t=la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');if(WIKI_SYNONYMS[t])t=WIKI_SYNONYMS[t];const r=await fetch('https://en.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(t)+'&prop=pageimages&format=json&pithumbsize=800&origin=*');const d=await r.json();const p=Object.values(d.query.pages)[0];if(p&&p.thumbnail&&p.thumbnail.source){const res=[{url:p.thumbnail.source,label:''}];imgC[la]=res;return res;}} catch(e2){}
     imgC[la]=[]; return [];
   }
 }
