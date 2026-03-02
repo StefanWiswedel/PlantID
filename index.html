@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1a1a">
-<title>Flora Sjælland</title>
+<title>Natur Sjælland</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=DM+Sans:ital,opsz,wght@0,9..40,300..600;1,9..40,300..600&display=swap" rel="stylesheet">
@@ -62,6 +62,15 @@ img{display:block;max-width:100%}
 .search-item-name{font-size:.86rem;font-weight:500}
 .search-item-la{font-size:.74rem;color:var(--tx2);font-style:italic;font-weight:300}
 .search-item-grp{font-size:.62rem;color:var(--tx3);margin-left:auto;flex-shrink:0}
+
+/* Domain switcher */
+.domain-bar{display:flex;gap:0;margin:14px 20px 0;background:var(--sf);border-radius:var(--rad);padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.domain-btn{flex:1;padding:12px 16px;border-radius:10px;font-size:.88rem;font-weight:600;color:var(--tx2);transition:all .2s;text-align:center}
+.domain-btn:active{transform:scale(.97)}
+.domain-btn.on{background:var(--ac);color:#fff;box-shadow:0 2px 8px rgba(45,106,79,.25)}
+.domain-btn .d-icon{margin-right:6px}
+/* Domain badge on My List cards */
+.mr-domain{font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:100px;flex-shrink:0}
 
 /* Confusion species link */
 .conf-link{color:var(--ac);text-decoration:underline;text-decoration-color:rgba(45,106,79,.35);text-underline-offset:2px;cursor:pointer;transition:text-decoration-color .15s}
@@ -257,7 +266,8 @@ img{display:block;max-width:100%}
 <body>
 <div id="app">
   <div class="v on" id="v-browse">
-    <div class="bh"><div class="logo">Flora <i>Sjælland</i></div><p class="bsub" id="bsub">Common plants of Zealand</p><a class="bh-link" href="curator.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Curate Images</a></div>
+    <div class="bh"><div class="logo">Natur <i>Sjælland</i></div><p class="bsub" id="bsub">Common plants of Zealand</p><a class="bh-link" href="curator.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Curate Images</a></div>
+    <div class="domain-bar" id="domain-bar"><button class="domain-btn on" data-d="flora" onclick="setDomain('flora')"><span class="d-icon">🌿</span>Flora</button><button class="domain-btn" data-d="fauna" onclick="setDomain('fauna')"><span class="d-icon">🦋</span>Fauna</button></div>
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
       <input type="text" class="search-input" id="search-input" placeholder="Search by name..." autocomplete="off">
@@ -269,6 +279,7 @@ img{display:block;max-width:100%}
   </div>
   <div class="v" id="v-identify">
     <div class="ih"><h1 class="it">Identify</h1><p class="it-sub">Select features you can see to narrow down species</p></div>
+    <div class="domain-bar" id="domain-bar-id"><button class="domain-btn on" data-d="flora" onclick="setDomain('flora')"><span class="d-icon">🌿</span>Flora</button><button class="domain-btn" data-d="fauna" onclick="setDomain('fauna')"><span class="d-icon">🦋</span>Fauna</button></div>
     <div id="sf-match"></div>
     <div id="sf-content"></div>
     <div class="sf-grid" id="sf-grid"></div>
@@ -328,12 +339,13 @@ img{display:block;max-width:100%}
 // ================================================================
 // DATA (loaded from species.json)
 // ================================================================
-let SP = [], GRP = [];
+let SP_FLORA=[], GRP_FLORA=[], SP_FAUNA=[], GRP_FAUNA=[];
+let SP=[], GRP=[];
 
 // ================================================================
 // FILTER DEFINITIONS
 // ================================================================
-const FILTERS = [
+const FILTERS_FLORA = [
   {id:'form',label:'Growth Form',multi:false,options:[
     {v:'tree',t:'Tree'},{v:'small-tree',t:'Small tree'},{v:'shrub',t:'Shrub'},
     {v:'herb',t:'Herb'},{v:'grass',t:'Grass'},{v:'fern',t:'Fern'},{v:'bulb',t:'Bulb'}]},
@@ -357,11 +369,40 @@ const FILTERS = [
     {v:'spring',t:'Spring'},{v:'summer',t:'Summer'},{v:'autumn',t:'Autumn'},{v:'winter',t:'Winter'}]},
   {id:'notable',label:'Notable Features',multi:true,dynamic:true}
 ];
-// (SP and GRP populated from species.json at runtime)
+const FILTERS_FAUNA = [
+  {id:'form',label:'Body Form',multi:false,options:[
+    {v:'butterfly',t:'Butterfly'},{v:'moth',t:'Moth'},{v:'beetle',t:'Beetle'},
+    {v:'bee',t:'Bee'},{v:'wasp',t:'Wasp'},{v:'ant',t:'Ant'},
+    {v:'hoverfly',t:'Hoverfly'},{v:'dragonfly',t:'Dragonfly'},{v:'damselfly',t:'Damselfly'},
+    {v:'earwig',t:'Earwig'},{v:'cricket',t:'Cricket'},{v:'grasshopper',t:'Grasshopper'},
+    {v:'spider',t:'Spider'},{v:'lacewing',t:'Lacewing'}]},
+  {id:'size',label:'Size',multi:false,options:[
+    {v:'small',t:'Small (<15 mm)'},{v:'medium',t:'Medium (15–40 mm)'},{v:'large',t:'Large (>40 mm)'}]},
+  {id:'wings',label:'Wings',multi:false,options:[
+    {v:'0',t:'None'},{v:'2',t:'2 wings'},{v:'4',t:'4 wings'}]},
+  {id:'color',label:'Main Colours',multi:true,options:[
+    {v:'red',t:'Red'},{v:'orange',t:'Orange'},{v:'yellow',t:'Yellow'},
+    {v:'green',t:'Green'},{v:'blue',t:'Blue'},{v:'purple',t:'Purple'},
+    {v:'brown',t:'Brown'},{v:'black',t:'Black'},{v:'white',t:'White'},{v:'metallic',t:'Metallic'}]},
+  {id:'habitat',label:'Where Found',multi:true,options:[
+    {v:'garden',t:'Garden'},{v:'meadow',t:'Meadow'},{v:'woodland',t:'Woodland'},
+    {v:'hedgerow',t:'Hedgerow'},{v:'wetland',t:'Wetland'},{v:'park',t:'Park'},
+    {v:'roadside',t:'Roadside'},{v:'house',t:'House'},{v:'coast',t:'Coast'},
+    {v:'farmland',t:'Farmland'}]},
+  {id:'behavior',label:'Behaviour',multi:true,options:[
+    {v:'flying',t:'Flying'},{v:'hovering',t:'Hovering'},{v:'crawling',t:'Crawling'},
+    {v:'on_flowers',t:'On flowers'},{v:'on_fruit',t:'On fruit'},
+    {v:'basking',t:'Basking'},{v:'jumping',t:'Jumping'}]},
+  {id:'active',label:'Active Season',multi:true,options:[
+    {v:'spring',t:'Spring'},{v:'summer',t:'Summer'},{v:'autumn',t:'Autumn'},{v:'winter',t:'Winter'}]},
+  {id:'notable',label:'Notable Features',multi:true,dynamic:true}
+];
+function getFilters(){ return domain==='flora'?FILTERS_FLORA:FILTERS_FAUNA; }
 
 // ================================================================
 // STATE
 // ================================================================
+let domain=localStorage.getItem('sn-domain')||'flora';
 let view='browse',filter='all',imgC={};
 let sfSel={}, sfOpen={}, notableTags=[];
 // Sightings: array of {id, date, lat, lng, note}
@@ -382,10 +423,13 @@ let sightMap = null, sightMarker = null, fullMap = null;
 // CURATED IMAGES
 // ================================================================
 let curatedImages = null;
+let curatedImagesFauna = null;
 async function loadCuratedImages() {
   if (curatedImages !== null) return;
   try { const r = await fetch('images.json'); if (!r.ok) throw 0; curatedImages = await r.json(); }
   catch { curatedImages = {}; }
+  try { const r = await fetch('images-insects.json'); if (!r.ok) throw 0; curatedImagesFauna = await r.json(); }
+  catch { curatedImagesFauna = {}; }
 }
 const curatedReady = loadCuratedImages();
 
@@ -420,7 +464,8 @@ async function fetchCatFiles(catTitle, limit) {
 async function fetchImgs(la) {
   if (imgC[la]) return imgC[la];
   await curatedReady;
-  if (curatedImages && curatedImages[la] && curatedImages[la].length > 0) { imgC[la]=curatedImages[la]; return imgC[la]; }
+  const allCurated = Object.assign({}, curatedImages||{}, curatedImagesFauna||{});
+  if (allCurated[la] && allCurated[la].length > 0) { imgC[la]=allCurated[la]; return imgC[la]; }
   const name = la.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g,'_');
   try {
     const subcats = await fetchSubcats(name);
@@ -489,6 +534,46 @@ window.addEventListener('popstate', e => {
   }
   go('browse',false);
 });
+
+// ================================================================
+// DOMAIN SWITCHING
+// ================================================================
+function findAnySpecies(id){ return SP_FLORA.find(x=>x.id===id)||SP_FAUNA.find(x=>x.id===id); }
+function findAnyGroup(gId,speciesId){
+  if(SP_FLORA.find(x=>x.id===speciesId)) return GRP_FLORA.find(x=>x.id===gId);
+  return GRP_FAUNA.find(x=>x.id===gId);
+}
+function getSpeciesDomain(id){
+  if(SP_FLORA.find(x=>x.id===id)) return 'flora';
+  if(SP_FAUNA.find(x=>x.id===id)) return 'fauna';
+  return null;
+}
+function setDomain(d){
+  domain=d;
+  localStorage.setItem('sn-domain',d);
+  if(d==='flora'){SP=SP_FLORA;GRP=GRP_FLORA;}
+  else{SP=SP_FAUNA;GRP=GRP_FAUNA;}
+  filter='all';
+  sfSel={};sfOpen={};
+  computeNotableTags();
+  renderDomainBtns();
+  updateBsub();
+  renderPills();
+  renderGrid();
+  if(view==='identify') renderSF();
+  if(view==='fieldlog') renderML();
+  clearSearch();
+}
+function renderDomainBtns(){
+  document.querySelectorAll('.domain-btn').forEach(b=>{
+    b.classList.toggle('on',b.dataset.d===domain);
+  });
+}
+function updateBsub(){
+  const el=document.getElementById('bsub');
+  if(domain==='flora') el.textContent=SP_FLORA.length+' common plants of Zealand';
+  else el.textContent=SP_FAUNA.length+' common invertebrates of Zealand';
+}
 
 // ================================================================
 // BROWSE
@@ -576,8 +661,8 @@ function clearSearch(){
 // DETAIL
 // ================================================================
 function openDet(id, pushState=true) {
-  const s=SP.find(x=>x.id===id);if(!s)return;
-  const g=GRP.find(x=>x.id===s.g)||{name:'',fg:'#666',bg:'#eee'}, sl=getSightingsFor(s.id), count=sl.length;
+  const s=findAnySpecies(id);if(!s)return;
+  const g=findAnyGroup(s.g,s.id)||{name:'',fg:'#666',bg:'#eee'}, sl=getSightingsFor(s.id), count=sl.length;
   let h = '<div class="car"><div class="car-t" id="ct-'+s.id+'" onscroll="onCS(\''+s.id+'\')"><div class="car-s"><div class="skel"></div></div></div><div class="car-d" id="cd-'+s.id+'"></div></div>'+
     '<div class="det-b"><div class="det-g" style="color:'+g.fg+';background:'+g.bg+'">'+g.name+'</div>'+
     '<h1 class="det-en">'+s.en+'</h1><p class="det-la">'+s.la+'</p>'+
@@ -588,7 +673,7 @@ function openDet(id, pushState=true) {
     '</div>'+
     (function(){
       const mi=[];
-      if(s.ht)mi.push({l:'Height',v:s.ht});
+      if(s.ht)mi.push({l:getSpeciesDomain(s.id)==='fauna'?'Size':'Height',v:s.ht});
       if(s.life)mi.push({l:'Lifespan',v:s.life});
       if(!mi.length)return '';
       return '<div class="det-m"'+(mi.length===1?' style="grid-template-columns:1fr"':'')+'>'+mi.map(m=>'<div class="meta"><div class="meta-l">'+m.l+'</div><div class="meta-v">'+m.v+'</div></div>').join('')+'</div>';
@@ -622,7 +707,8 @@ function openDet(id, pushState=true) {
     (s.conf&&s.conf.length?'<div class="sect"><h3 class="sect-t">Could Be Confused With</h3>'+s.conf.map(c=>{
       const laMatch=(c.sp.match(/^([^(]+)/)||[])[1];
       const laClean=laMatch?laMatch.trim():'';
-      const linked=laClean?SP.find(x=>x.la===laClean||x.la.replace(/\s+agg\.?/,'')===laClean):null;
+      const allSP=SP_FLORA.concat(SP_FAUNA);
+      const linked=laClean?allSP.find(x=>x.la===laClean||x.la.replace(/\s+agg\.?/,'')===laClean):null;
       const nameHtml=linked?'<span class="conf-link" onclick="event.stopPropagation();openDet(\''+linked.id+'\')">'+c.sp+'</span>':'<span>'+c.sp+'</span>';
       return '<div class="conf"><div class="conf-n">'+nameHtml+'</div><div class="conf-d">'+c.d+'</div></div>';
     }).join('')+'</div>':'')+
@@ -770,33 +856,40 @@ function updB() {
 // FIELD LOG
 // ================================================================
 function renderML() {
-  const el=document.getElementById('mlc'),seenIds=getSeenIds(),n=seenIds.length,total=SP.length||1,pct=(n/total*100).toFixed(0);
-  let h = '<div style="padding:8px 20px 0"><div class="mc">'+n+'<small> / '+SP.length+' species spotted</small></div></div><div class="pw"><div class="pf" style="width:'+pct+'%"></div></div><p class="mhn">'+(n===0?'Log your first sighting to start tracking.':n===SP.length?"You've spotted them all!":(SP.length-n)+' more to find.')+'</p>';
+  const el=document.getElementById('mlc'),seenIds=getSeenIds();
+  // Count species from both domains
+  const allSP=SP_FLORA.concat(SP_FAUNA);
+  const validIds=seenIds.filter(id=>allSP.find(x=>x.id===id));
+  const n=validIds.length,totalAll=allSP.length||1,pct=(n/totalAll*100).toFixed(0);
+  let h = '<div style="padding:8px 20px 0"><div class="mc">'+n+'<small> / '+totalAll+' species spotted</small></div></div><div class="pw"><div class="pf" style="width:'+pct+'%"></div></div><p class="mhn">'+(n===0?'Log your first sighting to start tracking.':n===totalAll?"You've spotted them all!":(totalAll-n)+' more to find.')+'</p>';
   if(sightings.length && sightings.some(s=>s.lat)) {
     h += '<button class="map-all-btn" onclick="openMapModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>View All on Map</button>';
   }
   if(!n) {
-    h += '<div class="me"><p>Head outside and log your first tree sighting!</p></div>';
+    h += '<div class="me"><p>Head outside and log your first sighting!</p></div>';
   } else {
-    // Group by species, sort by most recent sighting
-    const speciesOrder = seenIds.map(id=>{
+    const speciesOrder = validIds.map(id=>{
       const sl=getSightingsFor(id);
       const latest=sl.sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
       return {id,count:sl.length,latest};
     }).sort((a,b)=>new Date(b.latest.date)-new Date(a.latest.date));
     speciesOrder.forEach(({id,count,latest})=>{
-      const s=SP.find(x=>x.id===id);if(!s)return;
+      const s=findAnySpecies(id);if(!s)return;
+      const sDomain=getSpeciesDomain(id);
+      const g=findAnyGroup(s.g,s.id);
+      const domBadge=sDomain==='flora'?'<span class="mr-domain" style="color:#2d6a4f;background:#e8f5e9">🌿</span>':'<span class="mr-domain" style="color:#c2560a;background:#fef3e8">🦋</span>';
       const d=new Date(latest.date);
       const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
       h += '<div class="mr" onclick="openDet(\''+s.id+'\')">'+
         '<div class="mth" id="mt-'+s.id+'"><div class="skel" style="width:100%;height:100%"></div></div>'+
         '<div class="mi"><div class="mn">'+s.en+'</div><div class="mla">'+s.la+'</div>'+
         '<div class="msub">'+count+' sighting'+(count>1?'s':'')+' · Last: '+dateStr+'</div></div>'+
+        domBadge+
         '<button class="mrm" onclick="event.stopPropagation();rmSpecies(\''+s.id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>';
     });
   }
   el.innerHTML = h;
-  seenIds.forEach(id=>{const s=SP.find(x=>x.id===id);if(!s)return;const e=document.getElementById('mt-'+s.id);if(e)loadCardImg(e,s.la);});
+  validIds.forEach(id=>{const s=findAnySpecies(id);if(!s)return;const e=document.getElementById('mt-'+s.id);if(e)loadCardImg(e,s.la);});
 }
 function rmSpecies(id) {
   sightings = sightings.filter(s=>s.id!==id);
@@ -819,7 +912,7 @@ function openMapModal() {
     const bounds=[];
     sightings.forEach(sg=>{
       if(!sg.lat) return;
-      const s=SP.find(x=>x.id===sg.id);
+      const s=findAnySpecies(sg.id);
       const d=new Date(sg.date);
       const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
       const m=L.marker([sg.lat,sg.lng]).addTo(fullMap);
@@ -915,7 +1008,7 @@ function renderSF(){
   }
   let h='<div class="sf-wrap">';
   if(!hasSel) h+='<p class="sf-intro">Select what you can observe to narrow down species.</p>';
-  for(const cat of FILTERS){
+  for(const cat of getFilters()){
     const opts=cat.dynamic?notableTags:cat.options;
     if(!opts||!opts.length) continue;
     const isOpen=sfOpen[cat.id];
@@ -1069,13 +1162,17 @@ function lbUpdateTransform() {
 // ================================================================
 async function loadSpecies(){
   try{
-    const r=await fetch('species.json');
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    GRP=data.groups||[];
-    SP=data.species||[];
+    const [r1,r2]=await Promise.all([fetch('species.json'),fetch('species-insects.json')]);
+    if(!r1.ok)throw new Error('HTTP '+r1.status);
+    const d1=await r1.json();
+    GRP_FLORA=d1.groups||[];SP_FLORA=d1.species||[];
+    if(r2.ok){const d2=await r2.json();GRP_FAUNA=d2.groups||[];SP_FAUNA=d2.species||[];}
+    // Activate saved domain
+    if(domain==='fauna'&&SP_FAUNA.length){SP=SP_FAUNA;GRP=GRP_FAUNA;}
+    else{domain='flora';SP=SP_FLORA;GRP=GRP_FLORA;}
     computeNotableTags();
-    document.getElementById('bsub').textContent=SP.length+' common plants of Zealand';
+    renderDomainBtns();
+    updateBsub();
     renderPills();
     renderGrid();
     updB();
@@ -1092,7 +1189,7 @@ updB();
 history.replaceState({view:'browse'},'','#browse');
 
 if ('serviceWorker' in navigator) {
-  const sw = "const C='flora-v6';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.open(C).then(c=>caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))).then(()=>clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}return r;}).catch(()=>c);return c||f;}));});";
+  const sw = "const C='natur-v1';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.open(C).then(c=>caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k))))).then(()=>clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{const f=fetch(e.request).then(r=>{if(r&&r.status===200){const cl=r.clone();caches.open(C).then(ca=>ca.put(e.request,cl));}return r;}).catch(()=>c);return c||f;}));});";
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], {type: 'application/javascript'}))).catch(() => {});
 }
 </script>
