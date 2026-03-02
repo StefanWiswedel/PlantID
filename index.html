@@ -63,21 +63,6 @@ img{display:block;max-width:100%}
 .search-item-la{font-size:.74rem;color:var(--tx2);font-style:italic;font-weight:300}
 .search-item-grp{font-size:.62rem;color:var(--tx3);margin-left:auto;flex-shrink:0}
 
-/* Seasonal toggle */
-.season-wrap{padding:14px 20px 0}
-.season-toggle{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:var(--rad);border:1.5px solid var(--bd);background:var(--sf);transition:all .2s;-webkit-tap-highlight-color:transparent;text-align:left}
-.season-toggle:active{transform:scale(.98)}
-.season-toggle.on{background:var(--ac);border-color:var(--ac);color:#fff}
-.season-toggle .st-icon{font-size:1.2rem;flex-shrink:0}
-.season-toggle .st-text{flex:1;min-width:0}
-.season-toggle .st-label{font-size:.86rem;font-weight:600}
-.season-toggle .st-sub{font-size:.72rem;opacity:.6;margin-top:1px;font-weight:300}
-.season-toggle.on .st-sub{opacity:.75}
-.season-toggle .st-x{width:20px;height:20px;flex-shrink:0;opacity:.4;display:none}
-.season-toggle.on .st-x{display:block;opacity:.8}
-.season-hdr{padding:16px 20px 4px}
-.season-hdr-title{font-family:var(--fs);font-size:1.3rem;font-weight:700;color:var(--ac);line-height:1.2}
-.season-hdr-note{font-size:.8rem;color:var(--tx2);margin-top:4px;line-height:1.45;font-weight:300}
 /* Confusion species link */
 .conf-link{color:var(--ac);text-decoration:underline;text-decoration-color:rgba(45,106,79,.35);text-underline-offset:2px;cursor:pointer;transition:text-decoration-color .15s}
 .conf-link:active{text-decoration-color:var(--ac)}
@@ -279,8 +264,6 @@ img{display:block;max-width:100%}
       <button class="search-clear" id="search-clear" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
       <div class="search-results" id="search-results"></div>
     </div>
-    <div class="season-wrap"><button class="season-toggle" id="season-toggle" onclick="toggleSeason()"><span class="st-icon">🌱</span><div class="st-text"><div class="st-label">What's out now?</div><div class="st-sub" id="season-sub"></div></div><svg class="st-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button></div>
-    <div id="season-hdr"></div>
     <div class="pills" id="pills"></div>
     <div class="grid" id="grid"><div class="loading"><div class="spinner"></div><p>Loading species...</p></div></div>
   </div>
@@ -379,7 +362,7 @@ const FILTERS = [
 // ================================================================
 // STATE
 // ================================================================
-let view='browse',filter='all',imgC={},seasonOn=false;
+let view='browse',filter='all',imgC={};
 let sfSel={}, sfOpen={}, notableTags=[];
 // Sightings: array of {id, date, lat, lng, note}
 let sightings = JSON.parse(localStorage.getItem('fs-sightings')||'[]');
@@ -508,72 +491,6 @@ window.addEventListener('popstate', e => {
 });
 
 // ================================================================
-// SEASONAL MODE
-// ================================================================
-const MONTH_SEASON = ['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'];
-const MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
-const SEASON_ICONS = {winter:'❄️',spring:'🌱',summer:'☀️',autumn:'🍂'};
-const MONTH_HEADERS = {
-  0:{t:'Midwinter',n:'Snowdrops push through, hazel catkins begin'},
-  1:{t:'Late winter',n:'Catkins open, winter aconite and crocuses emerge'},
-  2:{t:'Early spring',n:'Blackthorn blossom, pussy willows, wood anemones carpet forests'},
-  3:{t:'Spring',n:'Wild cherry blossom, lesser celandine, Norway maple flowers'},
-  4:{t:'Late spring',n:'Cow parsley froths along roads, hawthorn and lilac bloom, beech leaves emerge'},
-  5:{t:'Early summer',n:'Elderflower, dog roses, meadow buttercups, ox-eye daisies'},
-  6:{t:'Midsummer',n:'Lime trees fragrant, meadowsweet, purple loosestrife along waterways'},
-  7:{t:'Late summer',n:'Heather turns moors purple, blackberries ripen, rowan berries redden'},
-  8:{t:'Early autumn',n:'Elderberries, sloes, rosehips, horse chestnut conkers fall'},
-  9:{t:'Autumn colour',n:'Beech turns copper, birch golden, acorns and beech mast drop'},
-  10:{t:'Late autumn',n:'Last leaves fall, holly berries redden, snowberry persists white'},
-  11:{t:'Early winter',n:'Holly and ivy, persistent haws and hips, bare tree silhouettes'}
-};
-const YEAR_ROUND_KW = /year[- ]?round|evergreen|persist|all year|throughout the year/i;
-
-function getCurMonth(){ return new Date().getMonth(); }
-function getCurSeason(){ return MONTH_SEASON[getCurMonth()]; }
-function getCurMonthName(){ return MONTH_NAMES[getCurMonth()]; }
-
-function seasonScore(s) {
-  const m = getCurMonth(), season = getCurSeason(), mName = getCurMonthName();
-  const bloom = s.filter && s.filter.bloom || [];
-  const txt = (s.season||'').toLowerCase();
-  const notable = s.filter && s.filter.notable || [];
-  // Must match season bloom OR year-round
-  const matchesSeason = bloom.includes(season);
-  const yearRound = YEAR_ROUND_KW.test(txt) || notable.includes('evergreen');
-  if (!matchesSeason && !yearRound) return -1;
-  // Score: current month name in season text = 3, current season = 2, fallback = 1
-  if (txt.includes(mName)) return 3;
-  if (txt.includes(season)) return 2;
-  return 1;
-}
-
-function getSeasonalSpecies() {
-  return SP.map(s=>({s,score:seasonScore(s)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.s);
-}
-
-function toggleSeason() {
-  seasonOn = !seasonOn;
-  document.getElementById('season-toggle').classList.toggle('on', seasonOn);
-  renderSeasonHeader();
-  renderGrid();
-}
-
-function renderSeasonHeader() {
-  const el = document.getElementById('season-hdr');
-  if (!seasonOn) { el.innerHTML=''; return; }
-  const m = getCurMonth(), h = MONTH_HEADERS[m];
-  const mLabel = MONTH_NAMES[m].charAt(0).toUpperCase()+MONTH_NAMES[m].slice(1);
-  el.innerHTML = '<div class="season-hdr"><div class="season-hdr-title">'+mLabel+' — '+h.t+'</div><div class="season-hdr-note">'+h.n+'</div></div>';
-}
-
-function initSeasonSub() {
-  const m = getCurMonth(), h = MONTH_HEADERS[m], season = getCurSeason();
-  document.getElementById('season-sub').textContent = h.t;
-  document.getElementById('season-toggle').querySelector('.st-icon').textContent = SEASON_ICONS[season]||'🌱';
-}
-
-// ================================================================
 // BROWSE
 // ================================================================
 const imgObserver = new IntersectionObserver((entries) => {
@@ -592,8 +509,7 @@ function renderPills() {
 }
 function setF(f,btn) { filter=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));btn.classList.add('on');renderGrid(); }
 function renderGrid() {
-  let base = seasonOn ? getSeasonalSpecies() : SP;
-  const el=document.getElementById('grid'), list=filter==='all'?base:base.filter(s=>s.g===filter), seenIds=getSeenIds();
+  const el=document.getElementById('grid'), list=filter==='all'?SP:SP.filter(s=>s.g===filter), seenIds=getSeenIds();
   el.innerHTML = list.map(s => {
     const ck=seenIds.includes(s.id);
     return '<div class="card" onclick="openDet(\''+s.id+'\')">'+
@@ -1160,7 +1076,6 @@ async function loadSpecies(){
     SP=data.species||[];
     computeNotableTags();
     document.getElementById('bsub').textContent=SP.length+' common plants of Zealand';
-    initSeasonSub();
     renderPills();
     renderGrid();
     updB();
