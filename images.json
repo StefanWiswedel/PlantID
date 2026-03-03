@@ -232,5 +232,75 @@
       "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Oberhausen_Obere_Hauptstra%C3%9Fe_008_2018_05_08.jpg/500px-Oberhausen_Obere_Hauptstra%C3%9Fe_008_2018_05_08.jpg",
       "label": "Bark"
     }
+  ],
+  "Alnus glutinosa": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/20130314Alnus_glutinosa1.jpg/500px-20130314Alnus_glutinosa1.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/2018_08_05_Alnus_glutinosa.jpg/500px-2018_08_05_Alnus_glutinosa.jpg",
+      "label": "Leaves"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/20121214%27Alnus_glutinosa1.jpg/500px-20121214%27Alnus_glutinosa1.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/%28ms%29_Alnus_glutinosa_8.jpg/500px-%28ms%29_Alnus_glutinosa_8.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/20120904Alnus_glutinosa14.jpg/500px-20120904Alnus_glutinosa14.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/20150202Alnus_glutinosa2.jpg/500px-20150202Alnus_glutinosa2.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/20180216Alnus_glutinosa1.jpg/500px-20180216Alnus_glutinosa1.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/20180227Alnus_glutinosa1.jpg/500px-20180227Alnus_glutinosa1.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Alkottar.jpg/500px-Alkottar.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Alnus_glutinosa_kz31.jpg/500px-Alnus_glutinosa_kz31.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Alnus_glutinosa_bud3.jpg/500px-Alnus_glutinosa_bud3.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Alnus_glutinosa_bud.jpg/500px-Alnus_glutinosa_bud.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Alnus_glutinosa_Olsza_czarna_2022-08-10_Rezerwat_Dziki_Staw_01.jpg/500px-Alnus_glutinosa_Olsza_czarna_2022-08-10_Rezerwat_Dziki_Staw_01.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Alder_tree_bark%2C_Chapeltoun%2C_North_Ayrshire.jpg/500px-Alder_tree_bark%2C_Chapeltoun%2C_North_Ayrshire.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Common_alder_trunk_with_leaves.jpg/500px-Common_alder_trunk_with_leaves.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Alnus_glutinosa_sl11.jpg/500px-Alnus_glutinosa_sl11.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Alnus_glutinosa_20081026.jpg/500px-Alnus_glutinosa_20081026.jpg",
+      "label": "Bark"
+    }
   ]
 }
