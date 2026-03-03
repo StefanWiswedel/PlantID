@@ -760,11 +760,10 @@ async function saveToGitHub() {
   isSaving = true;
   updateGHStatus('saving');
   try {
-    // Save both files (fetches fresh SHA before each save to avoid conflicts)
-    const saves = [];
-    if (hasFlora) saves.push(saveGHFile(GH_FILE_FLORA, outFlora).then(sha => { ghFileShaFlora = sha; }));
-    if (hasFauna) saves.push(saveGHFile(GH_FILE_FAUNA, outFauna).then(sha => { ghFileShaFauna = sha; }));
-    await Promise.all(saves);
+    // Save sequentially — each save creates a commit, so the second file's
+    // SHA would be stale if we saved in parallel
+    if (hasFlora) ghFileShaFlora = await saveGHFile(GH_FILE_FLORA, outFlora);
+    if (hasFauna) ghFileShaFauna = await saveGHFile(GH_FILE_FAUNA, outFauna);
 
     updateGHStatus('saved');
     setTimeout(() => { if (!isSaving) updateGHStatus('connected'); }, 2000);
