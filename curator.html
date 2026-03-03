@@ -695,14 +695,28 @@ async function loadFromGitHub() {
   }
 }
 
-async function saveGHFile(fileName, data, sha) {
+async function fetchCurrentSha(fileName) {
+  const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + fileName + '?ref=' + ghBranch;
+  try {
+    const r = await fetch(url, { headers: ghHeaders() });
+    if (r.status === 404) return null;
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.sha;
+  } catch { return null; }
+}
+
+async function saveGHFile(fileName, data) {
+  // Always fetch the latest SHA right before saving to avoid conflicts
+  const freshSha = await fetchCurrentSha(fileName);
+
   const json = JSON.stringify(data, null, 2) + '\n';
   const body = {
     message: 'Update curated images — ' + fileName + ' (' + Object.keys(data).length + ' species)',
     content: btoa(unescape(encodeURIComponent(json))),
     branch: ghBranch
   };
-  if (sha) body.sha = sha;
+  if (freshSha) body.sha = freshSha;
 
   const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + fileName;
   const r = await fetch(url, {
@@ -746,10 +760,10 @@ async function saveToGitHub() {
   isSaving = true;
   updateGHStatus('saving');
   try {
-    // Save both files (only if there's data or existing file to update)
+    // Save both files (fetches fresh SHA before each save to avoid conflicts)
     const saves = [];
-    if (hasFlora) saves.push(saveGHFile(GH_FILE_FLORA, outFlora, ghFileShaFlora).then(sha => { ghFileShaFlora = sha; }));
-    if (hasFauna) saves.push(saveGHFile(GH_FILE_FAUNA, outFauna, ghFileShaFauna).then(sha => { ghFileShaFauna = sha; }));
+    if (hasFlora) saves.push(saveGHFile(GH_FILE_FLORA, outFlora).then(sha => { ghFileShaFlora = sha; }));
+    if (hasFauna) saves.push(saveGHFile(GH_FILE_FAUNA, outFauna).then(sha => { ghFileShaFauna = sha; }));
     await Promise.all(saves);
 
     updateGHStatus('saved');
