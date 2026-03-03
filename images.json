@@ -108,5 +108,55 @@
       "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Alexandra_Lake_Wanstead_Flats_Redbridge_London_-_Silver_birch_01.jpg/500px-Alexandra_Lake_Wanstead_Flats_Redbridge_London_-_Silver_birch_01.jpg",
       "label": "Whole tree"
     }
+  ],
+  "Fraxinus excelsior": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Fraxinus_excelsior11.JPEG/500px-Fraxinus_excelsior11.JPEG",
+      "label": "Whole tree"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/IKAl_090920_Esche_Fr%C3%BCchte.jpg/500px-IKAl_090920_Esche_Fr%C3%BCchte.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Fraxinus_excelsior_4560.jpg/500px-Fraxinus_excelsior_4560.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/20140304Fraxinus_excelsior4.jpg/500px-20140304Fraxinus_excelsior4.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/20140302Fraxinus_excelsior1.jpg/500px-20140302Fraxinus_excelsior1.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/20140131Fraxinus_excelsior1.jpg/500px-20140131Fraxinus_excelsior1.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/20150320Fraxinus_excelsior4.jpg/500px-20150320Fraxinus_excelsior4.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/2021-03-09_13_48_47_European_Ash_bark_along_Stone_Heather_Drive_in_the_Chantilly_Highlands_section_of_Oak_Hill%2C_Fairfax_County%2C_Virginia.jpg/500px-2021-03-09_13_48_47_European_Ash_bark_along_Stone_Heather_Drive_in_the_Chantilly_Highlands_section_of_Oak_Hill%2C_Fairfax_County%2C_Virginia.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Ask_%28Fraxinus_excelsior%29%2C_bark%2C_V%C3%A4smestorps_naturreservat_2023-05-10_%282746%29.jpg/500px-Ask_%28Fraxinus_excelsior%29%2C_bark%2C_V%C3%A4smestorps_naturreservat_2023-05-10_%282746%29.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/20140317Fraxinus_excelsior3.jpg/500px-20140317Fraxinus_excelsior3.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/20120901Park_Wasserturm_Hockenheim6.jpg/500px-20120901Park_Wasserturm_Hockenheim6.jpg",
+      "label": "Leaves"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/20120901Esche_Hockenheimer_Rheinbogen5.jpg/500px-20120901Esche_Hockenheimer_Rheinbogen5.jpg",
+      "label": "Leaves"
+    }
   ]
 }
