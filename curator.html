@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flora Sjælland — Image Curator</title>
+<title>Natur Sjælland — Image Curator</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f0f0;color:#222;font-size:14px}
@@ -14,10 +14,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .progress{font-size:13px;color:#555}
 .progress strong{color:#2d5a27}
 .main{display:flex;height:calc(100vh - 45px)}
-.sidebar{width:260px;min-width:260px;background:#fff;border-right:1px solid #ddd;overflow-y:auto;flex-shrink:0}
+.sidebar{width:280px;min-width:280px;background:#fff;border-right:1px solid #ddd;overflow-y:auto;flex-shrink:0}
 .content{flex:1;overflow-y:auto;padding:16px}
 
-/* Sidebar */
+/* Sidebar domain sections */
+.sb-section{border-bottom:2px solid #e0e0e0}
+.sb-domain{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px 8px;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.sb-domain.flora-hdr{background:#2d5a27}
+.sb-domain.fauna-hdr{background:#7a5520}
+.sb-domain .arrow{font-size:10px;transition:transform .2s}
+.sb-section.collapsed .sb-body{display:none}
+.sb-section.collapsed .arrow{transform:rotate(-90deg)}
+.sb-group{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:6px 14px 4px;color:#888;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:6px}
+.sb-group .g-icon{font-size:13px}
+.sb-group .g-count{font-weight:400;color:#aaa;margin-left:auto;font-size:10px}
+
+/* Sidebar species items */
 .sp-item{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:13px;transition:background .1s}
 .sp-item:hover{background:#f5f5f5}
 .sp-item.active{background:#e8f0e6;font-weight:600}
@@ -104,7 +116,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div style="display:flex;align-items:center;gap:10px">
     <div id="gh-status" style="font-size:12px"></div>
     <button onclick="showTokenPrompt()" style="background:none;border:1px solid #ccc;border-radius:4px;padding:3px 8px;cursor:pointer;font-size:18px" title="GitHub token">&#128273;</button>
-    <div class="progress"><strong id="prog-count">0</strong> / 20 curated</div>
+    <div class="progress"><strong id="prog-count">0</strong> / <span id="prog-total">0</span> curated</div>
   </div>
 </div>
 <div class="main">
@@ -113,24 +125,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <select class="mobile-select" id="mobile-select" onchange="if(this.value)selectSpecies(this.value)">
       <option value="">Choose a species...</option>
     </select>
-    <div class="status" id="main-status">Select a species to begin curating images.</div>
+    <div class="status" id="main-status">Loading species data...</div>
   </div>
 </div>
 
 <script>
 // ================================================================
-// SPECIES
+// SPECIES — loaded dynamically from JSON files
 // ================================================================
-const SPECIES = [
-  'Fagus sylvatica','Quercus robur','Betula pendula','Fraxinus excelsior',
-  'Tilia cordata','Alnus glutinosa','Populus tremula','Ulmus glabra',
-  'Picea abies','Pinus sylvestris','Larix decidua','Acer platanoides',
-  'Acer pseudoplatanus','Aesculus hippocastanum','Carpinus betulus',
-  'Sorbus aucuparia','Prunus avium','Prunus padus','Salix caprea',
-  'Crataegus monogyna'
-];
+let ALL_SPECIES = [];   // [{la, en, groupId, groupName, groupIcon, domain}]
+let GROUPS_FLORA = [];
+let GROUPS_FAUNA = [];
 
-const LABELS = ['Whole tree','Bark','Leaves','Flowers','Fruit/Seeds','Buds/Twigs','Autumn','Other'];
+const LABELS_FLORA = ['Whole plant','Bark','Leaves','Flowers','Fruit/Seeds','Buds/Twigs','Autumn','Habitat','Other'];
+const LABELS_FAUNA = ['Adult','Dorsal view','Ventral view','Larva/Caterpillar','Male','Female','In habitat','Other'];
+
+function getLabels(species) {
+  const sp = ALL_SPECIES.find(s => s.la === species);
+  return sp && sp.domain === 'fauna' ? LABELS_FAUNA : LABELS_FLORA;
+}
+
+function getSpeciesDomain(species) {
+  const sp = ALL_SPECIES.find(s => s.la === species);
+  return sp ? sp.domain : 'flora';
+}
+
+// Taxonomic synonyms (old name → Wikimedia Commons name)
+const WIKI_SYNONYMS = {'Chorthippus_parallelus':'Pseudochorthippus_parallelus'};
 
 const COMMONS = 'https://commons.wikimedia.org/w/api.php';
 
@@ -145,7 +166,7 @@ const SKIP_CAT = new RegExp([
   'print','lithograph','woodcut','sculpture','carving','statue',
   // Wood products & industry
   '\\bwood\\b','timber','lumber','furniture','veneer','plank','charcoal',
-  // Locations & geography (subcats like "Fagus sylvatica in France")
+  // Locations & geography
   'in\\s+(the\\s+)?[A-Z]','\\bin\\s+\\w+$','country','region','province',
   'national','state\\b','county','district','municipality',
   // Historical & archival
@@ -173,7 +194,9 @@ const SKIP_CAT = new RegExp([
   // Commons-specific junk categories
   'animal','bonsai','distribution.?map','famous','incidental',
   'low.?quality','named.?individual','notable','champion.?tree',
-  'oldest','largest','record.?tree','remarkable'
+  'oldest','largest','record.?tree','remarkable',
+  // Entomology-specific junk
+  'collection','pinned','mounted','specimen','genitalia','dissect'
 ].join('|'), 'i');
 
 // Filenames to skip
@@ -203,28 +226,42 @@ const SKIP_FILE = new RegExp([
   'food','dish','plate','bowl','jam','pie','cake','syrup','tea[_ ]',
   'honey','juice','wine','beer','liqueur','table[_ ]','kitchen',
   // Urban & landscape
-  'aerial','panorama','skyline','drone','satellite'
+  'aerial','panorama','skyline','drone','satellite',
+  // Entomology junk
+  'pinned','mounted','collection','genitalia','dissect'
 ].join('|'), 'i');
 
-// Map subcategory keywords → label
-const LABEL_MAP = [
+// Map subcategory keywords → label (flora)
+const LABEL_MAP_FLORA = [
   { label:'Leaves',      kw:/\b(leaf|leaves|leav|foliage|needle|needles)\b/i },
   { label:'Bark',        kw:/\b(bark|trunk|rind)\b/i },
   { label:'Flowers',     kw:/\b(flower|flowers|blossom|catkin|infloresc|strobil)\b/i },
   { label:'Fruit/Seeds', kw:/\b(fruit|fruits|seed|seeds|cone|cones|acorn|nut|berry|berries|haw|samara)\b/i },
   { label:'Buds/Twigs',  kw:/\b(bud|buds|twig|shoot)\b/i },
   { label:'Autumn',      kw:/\b(autumn|fall|herbst)\b/i },
+  { label:'Habitat',     kw:/\b(habitat|biotope|environment)\b/i },
 ];
 
-function guessLabel(catName) {
-  for (const m of LABEL_MAP) {
+// Map subcategory keywords → label (fauna)
+const LABEL_MAP_FAUNA = [
+  { label:'Larva/Caterpillar', kw:/\b(larva|larvae|larval|caterpillar|nymph|grub|maggot|pupa|pupae|chrysalis|cocoon|instar)\b/i },
+  { label:'Male',              kw:/\b(male|males|♂)\b/i },
+  { label:'Female',            kw:/\b(female|females|♀)\b/i },
+  { label:'Dorsal view',       kw:/\b(dorsal|upper|above|top.?view|upperside)\b/i },
+  { label:'Ventral view',      kw:/\b(ventral|under|below|beneath|underside)\b/i },
+  { label:'In habitat',        kw:/\b(habitat|biotope|environment|in.?situ)\b/i },
+];
+
+function guessLabel(catName, species) {
+  const dom = getSpeciesDomain(species);
+  const map = dom === 'fauna' ? LABEL_MAP_FAUNA : LABEL_MAP_FLORA;
+  for (const m of map) {
     if (m.kw.test(catName)) return m.label;
   }
-  return 'Whole tree';
+  return dom === 'fauna' ? 'Adult' : 'Whole plant';
 }
 
 function shortCatName(catTitle, speciesName) {
-  // "Category:Fagus sylvatica (bark)" → "bark"
   let s = catTitle.replace(/^Category:/i, '').trim();
   s = s.replace(new RegExp(speciesName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'i'), '').trim();
   s = s.replace(/^\(|\)$/g, '').replace(/^[-–—_\s]+|[-–—_\s]+$/g, '').trim();
@@ -236,20 +273,22 @@ function shortCatName(catTitle, speciesName) {
 // ================================================================
 const GH_OWNER = 'StefanWiswedel';
 const GH_REPO  = 'PlantID';
-const GH_FILE  = 'images.json';
+const GH_FILE_FLORA = 'images.json';
+const GH_FILE_FAUNA = 'images-insects.json';
 const GH_API   = 'https://api.github.com';
 
-let ghBranch = null;   // detected from GitHub Pages config
+let ghBranch = null;
 let ghToken = localStorage.getItem('gh-token') || '';
-let ghFileSha = null;  // SHA of the current images.json (needed for updates)
+let ghFileShaFlora = null;
+let ghFileShaFauna = null;
 
 // ================================================================
 // STATE
 // ================================================================
 let curatedData = {};    // { "Fagus sylvatica": [{url, label}, ...], ... }
 let currentSpecies = null;
-let loadedImages = [];   // [{url, thumbUrl, srcLabel, catName}]
-let selectedImages = []; // [{url, thumbUrl, label}]
+let loadedImages = [];
+let selectedImages = [];
 let isLoading = false;
 let isSaving = false;
 
@@ -293,27 +332,23 @@ async function fetchCatFiles(catTitle, limit) {
 }
 
 async function loadImagesForSpecies(species) {
-  const name = species.replace(/ /g, '_');
+  // Clean name: strip "agg.", "s.l.", "s.str." and apply synonyms
+  let name = species.replace(/\s+agg\.?/gi,'').replace(/\s+s\.\s*(l|str)\.?/gi,'').trim().replace(/ /g, '_');
+  if (WIKI_SYNONYMS[name]) name = WIKI_SYNONYMS[name];
+
   const allImages = [];
   const seen = new Set();
 
-  // Fetch subcategories
   const subcats = await fetchSubcats(name);
   const validSubcats = subcats.filter(c => !SKIP_CAT.test(c));
 
-  // Build fetch tasks: parent + subcats
   const tasks = [];
-
-  // Parent category — up to 50
   tasks.push({ cat: 'Category:' + name, limit: 50, label: 'general' });
-
-  // Each subcategory — up to 20
   for (const cat of validSubcats) {
     const sn = shortCatName(cat, species);
     tasks.push({ cat, limit: 20, label: sn });
   }
 
-  // Fetch all in parallel
   const results = await Promise.all(
     tasks.map(t => fetchCatFiles(t.cat, t.limit).then(imgs => ({ imgs, label: t.label, cat: t.cat })))
   );
@@ -326,7 +361,7 @@ async function loadImagesForSpecies(species) {
           thumbUrl: img.thumbUrl,
           url: img.fullUrl,
           srcLabel: r.label,
-          suggestedLabel: guessLabel(r.cat + ' ' + r.label)
+          suggestedLabel: guessLabel(r.cat + ' ' + r.label, species)
         });
       }
     }
@@ -336,32 +371,84 @@ async function loadImagesForSpecies(species) {
 }
 
 // ================================================================
-// SIDEBAR
+// SIDEBAR — categorized by domain and group
 // ================================================================
 function renderSidebar() {
   const el = document.getElementById('sidebar');
-  el.innerHTML = SPECIES.map(sp => {
-    const done = curatedData[sp] && curatedData[sp].length > 0;
-    const active = sp === currentSpecies;
-    return '<div class="sp-item' + (active ? ' active' : '') + '" onclick="selectSpecies(\'' + sp.replace(/'/g, "\\'") + '\')">' +
-      '<div class="sp-tick' + (done ? ' done' : '') + '">' + (done ? '✓' : '') + '</div>' +
-      '<div class="sp-info"><div class="sp-en">' + sp + '</div></div></div>';
-  }).join('');
-  // Mobile dropdown
-  const sel = document.getElementById('mobile-select');
-  if(sel) {
-    sel.innerHTML = '<option value="">Choose a species...</option>' +
-      SPECIES.map(sp => {
-        const done = curatedData[sp] && curatedData[sp].length > 0;
-        return '<option value="' + escAttr(sp) + '"' + (sp===currentSpecies?' selected':'') + '>' + (done?'✓ ':'') + sp + '</option>';
-      }).join('');
+  let html = '';
+
+  // Build groups for each domain
+  for (const dom of ['flora', 'fauna']) {
+    const groups = dom === 'flora' ? GROUPS_FLORA : GROUPS_FAUNA;
+    const domSpecies = ALL_SPECIES.filter(s => s.domain === dom);
+    if (domSpecies.length === 0) continue;
+
+    const domLabel = dom === 'flora' ? '🌿 Flora' : '🦋 Fauna';
+    const domCurated = domSpecies.filter(s => curatedData[s.la] && curatedData[s.la].length > 0).length;
+
+    html += '<div class="sb-section" data-domain="' + dom + '">';
+    html += '<div class="sb-domain ' + dom + '-hdr" onclick="toggleSbSection(this)">' +
+      domLabel + ' <span style="font-weight:400;font-size:11px;opacity:.8">' + domCurated + '/' + domSpecies.length + '</span>' +
+      ' <span class="arrow">&#9660;</span></div>';
+    html += '<div class="sb-body">';
+
+    for (const grp of groups) {
+      const grpSpecies = domSpecies.filter(s => s.groupId === grp.id);
+      if (grpSpecies.length === 0) continue;
+
+      html += '<div class="sb-group"><span class="g-icon">' + escHtml(grp.icon) + '</span> ' +
+        escHtml(grp.name) + '<span class="g-count">' + grpSpecies.length + '</span></div>';
+
+      for (const sp of grpSpecies) {
+        const done = curatedData[sp.la] && curatedData[sp.la].length > 0;
+        const active = sp.la === currentSpecies;
+        html += '<div class="sp-item' + (active ? ' active' : '') + '" onclick="selectSpecies(\'' + sp.la.replace(/'/g, "\\'") + '\')">' +
+          '<div class="sp-tick' + (done ? ' done' : '') + '">' + (done ? '✓' : '') + '</div>' +
+          '<div class="sp-info"><div class="sp-en">' + escHtml(sp.en) + '</div>' +
+          '<div class="sp-la">' + escHtml(sp.la) + '</div></div></div>';
+      }
+    }
+
+    html += '</div></div>';
   }
+
+  el.innerHTML = html;
+
+  // Mobile dropdown with optgroups
+  const sel = document.getElementById('mobile-select');
+  if (sel) {
+    let opts = '<option value="">Choose a species...</option>';
+    for (const dom of ['flora', 'fauna']) {
+      const groups = dom === 'flora' ? GROUPS_FLORA : GROUPS_FAUNA;
+      const domSpecies = ALL_SPECIES.filter(s => s.domain === dom);
+      if (domSpecies.length === 0) continue;
+
+      for (const grp of groups) {
+        const grpSpecies = domSpecies.filter(s => s.groupId === grp.id);
+        if (grpSpecies.length === 0) continue;
+        opts += '<optgroup label="' + escAttr(grp.icon + ' ' + grp.name) + '">';
+        for (const sp of grpSpecies) {
+          const done = curatedData[sp.la] && curatedData[sp.la].length > 0;
+          opts += '<option value="' + escAttr(sp.la) + '"' + (sp.la === currentSpecies ? ' selected' : '') + '>' +
+            (done ? '✓ ' : '') + sp.en + ' (' + sp.la + ')</option>';
+        }
+        opts += '</optgroup>';
+      }
+    }
+    sel.innerHTML = opts;
+  }
+
   updateProgress();
 }
 
+function toggleSbSection(el) {
+  el.closest('.sb-section').classList.toggle('collapsed');
+}
+
 function updateProgress() {
-  const count = SPECIES.filter(sp => curatedData[sp] && curatedData[sp].length > 0).length;
+  const count = ALL_SPECIES.filter(sp => curatedData[sp.la] && curatedData[sp.la].length > 0).length;
   document.getElementById('prog-count').textContent = count;
+  document.getElementById('prog-total').textContent = ALL_SPECIES.length;
 }
 
 // ================================================================
@@ -369,13 +456,11 @@ function updateProgress() {
 // ================================================================
 async function selectSpecies(species) {
   if (isLoading) return;
-  // Save current selection before switching
   saveCurrentSelection();
 
   currentSpecies = species;
   renderSidebar();
 
-  // Restore previous selections for this species
   selectedImages = [];
   if (curatedData[species]) {
     selectedImages = curatedData[species].map(item => ({
@@ -385,11 +470,12 @@ async function selectSpecies(species) {
     }));
   }
 
-  // Show loading
   isLoading = true;
   document.getElementById('content').innerHTML =
+    '<select class="mobile-select" id="mobile-select" onchange="if(this.value)selectSpecies(this.value)"><option value="">Choose a species...</option></select>' +
     '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
-    '<div class="loading">Loading images for <strong>' + species + '</strong> from Wikimedia Commons...</div>';
+    '<div class="loading">Loading images for <strong>' + escHtml(species) + '</strong> from Wikimedia Commons...</div>';
+  renderSidebar(); // re-render mobile dropdown
 
   try {
     loadedImages = await loadImagesForSpecies(species);
@@ -399,7 +485,7 @@ async function selectSpecies(species) {
     isLoading = false;
     document.getElementById('content').innerHTML =
       '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
-      '<div class="status">Error loading images: ' + e.message + '</div>';
+      '<div class="status">Error loading images: ' + escHtml(e.message) + '</div>';
   }
 }
 
@@ -426,11 +512,15 @@ function renderToolbarButtons() {
 
 function renderContent() {
   if (!currentSpecies) {
-    document.getElementById('content').innerHTML = '<div class="status">Select a species from the sidebar.</div>';
+    document.getElementById('content').innerHTML =
+      '<select class="mobile-select" id="mobile-select" onchange="if(this.value)selectSpecies(this.value)"><option value="">Choose a species...</option></select>' +
+      '<div class="status">Select a species from the sidebar.</div>';
+    renderSidebar();
     return;
   }
 
   const selectedUrls = new Set(selectedImages.map(s => s.thumbUrl));
+  const labels = getLabels(currentSpecies);
 
   // Group by source label
   const groups = {};
@@ -440,7 +530,6 @@ function renderContent() {
     groups[key].push(img);
   }
 
-  // Sort groups: "general" last, rest alphabetical
   const groupKeys = Object.keys(groups).sort((a, b) => {
     if (a === 'general') return 1;
     if (b === 'general') return -1;
@@ -462,16 +551,20 @@ function renderContent() {
     gridHTML += '</div></div>';
   }
 
-  const html = '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
+  const html =
+    '<select class="mobile-select" id="mobile-select" onchange="if(this.value)selectSpecies(this.value)"><option value="">Choose a species...</option></select>' +
+    '<div class="toolbar">' + renderToolbarButtons() + '</div>' +
     (loadedImages.length === 0
-      ? '<div class="status">No images found for ' + currentSpecies + '</div>'
+      ? '<div class="status">No images found for ' + escHtml(currentSpecies) + '</div>'
       : gridHTML) +
     renderSelectedPanel();
 
   document.getElementById('content').innerHTML = html;
+  renderSidebar(); // re-render mobile dropdown
 }
 
 function renderSelectedPanel() {
+  const labels = getLabels(currentSpecies);
   let html = '<div class="sel-panel"><h3>Selected images (' + selectedImages.length + ')</h3>';
   if (selectedImages.length === 0) {
     html += '<div class="sel-empty">Click thumbnails above to select images. Image #1 will be the hero/cover image.</div>';
@@ -483,7 +576,7 @@ function renderSelectedPanel() {
         '<div class="sel-thumb"><img src="' + escAttr(img.thumbUrl) + '"></div>' +
         '<div class="sel-info">' +
         '<select class="sel-label-select" onchange="changeLabel(' + i + ',this.value)">' +
-        LABELS.map(l => '<option value="' + escAttr(l) + '"' + (img.label === l ? ' selected' : '') + '>' + escHtml(l) + '</option>').join('') +
+        labels.map(l => '<option value="' + escAttr(l) + '"' + (img.label === l ? ' selected' : '') + '>' + escHtml(l) + '</option>').join('') +
         '</select>' +
         '<div class="sel-url">' + escHtml(img.url) + '</div></div>' +
         '<div class="sel-actions">' +
@@ -542,7 +635,7 @@ function clearSelection() {
 }
 
 // ================================================================
-// GITHUB API — load & save images.json directly on the repo
+// GITHUB API — load & save images.json + images-insects.json
 // ================================================================
 function ghHeaders() {
   return {
@@ -552,7 +645,6 @@ function ghHeaders() {
 }
 
 async function detectBranch() {
-  // Use the GitHub Pages API to find which branch is being served
   try {
     const r = await fetch(GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/pages', { headers: ghHeaders() });
     if (r.ok) {
@@ -563,7 +655,6 @@ async function detectBranch() {
       }
     }
   } catch {}
-  // Fallback: use the repo's default branch
   try {
     const r = await fetch(GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO, { headers: ghHeaders() });
     if (r.ok) {
@@ -575,32 +666,56 @@ async function detectBranch() {
   ghBranch = 'main';
 }
 
+async function loadGHFile(fileName) {
+  const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + fileName + '?ref=' + ghBranch;
+  const r = await fetch(url, { headers: ghHeaders() });
+  if (r.status === 404) return { data: {}, sha: null };
+  if (!r.ok) throw new Error('GitHub API ' + r.status);
+  const d = await r.json();
+  const content = atob(d.content.replace(/\n/g, ''));
+  const parsed = JSON.parse(content);
+  return { data: (typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {}, sha: d.sha };
+}
+
 async function loadFromGitHub() {
   if (!ghToken) return;
   updateGHStatus('loading');
   try {
     await detectBranch();
-    const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE + '?ref=' + ghBranch;
-    const r = await fetch(url, { headers: ghHeaders() });
-    if (r.status === 404) {
-      // File doesn't exist yet — that's fine, start fresh
-      ghFileSha = null;
-      curatedData = {};
-      updateGHStatus('connected');
-      return;
-    }
-    if (!r.ok) throw new Error('GitHub API ' + r.status);
-    const data = await r.json();
-    ghFileSha = data.sha;
-    const content = atob(data.content.replace(/\n/g, ''));
-    const parsed = JSON.parse(content);
-    if (typeof parsed === 'object' && !Array.isArray(parsed)) {
-      curatedData = parsed;
-    }
+    const [flora, fauna] = await Promise.all([
+      loadGHFile(GH_FILE_FLORA),
+      loadGHFile(GH_FILE_FAUNA)
+    ]);
+    ghFileShaFlora = flora.sha;
+    ghFileShaFauna = fauna.sha;
+    curatedData = Object.assign({}, flora.data, fauna.data);
     updateGHStatus('connected');
   } catch (err) {
     updateGHStatus('error', err.message);
   }
+}
+
+async function saveGHFile(fileName, data, sha) {
+  const json = JSON.stringify(data, null, 2) + '\n';
+  const body = {
+    message: 'Update curated images — ' + fileName + ' (' + Object.keys(data).length + ' species)',
+    content: btoa(unescape(encodeURIComponent(json))),
+    branch: ghBranch
+  };
+  if (sha) body.sha = sha;
+
+  const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + fileName;
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({}));
+    throw new Error(err.message || ('HTTP ' + r.status));
+  }
+  const result = await r.json();
+  return result.content.sha;
 }
 
 async function saveToGitHub() {
@@ -609,13 +724,21 @@ async function saveToGitHub() {
     return;
   }
   saveCurrentSelection();
-  const out = {};
-  for (const sp of SPECIES) {
-    if (curatedData[sp] && curatedData[sp].length > 0) {
-      out[sp] = curatedData[sp];
+
+  // Split curated data into flora and fauna
+  const outFlora = {};
+  const outFauna = {};
+  for (const sp of ALL_SPECIES) {
+    if (curatedData[sp.la] && curatedData[sp.la].length > 0) {
+      if (sp.domain === 'flora') outFlora[sp.la] = curatedData[sp.la];
+      else outFauna[sp.la] = curatedData[sp.la];
     }
   }
-  if (Object.keys(out).length === 0) {
+
+  const hasFlora = Object.keys(outFlora).length > 0 || ghFileShaFlora;
+  const hasFauna = Object.keys(outFauna).length > 0 || ghFileShaFauna;
+
+  if (!hasFlora && !hasFauna) {
     alert('Nothing to save — no species have curated images yet.');
     return;
   }
@@ -623,26 +746,12 @@ async function saveToGitHub() {
   isSaving = true;
   updateGHStatus('saving');
   try {
-    const json = JSON.stringify(out, null, 2) + '\n';
-    const body = {
-      message: 'Update curated images (' + Object.keys(out).length + ' species)',
-      content: btoa(unescape(encodeURIComponent(json))),
-      branch: ghBranch
-    };
-    if (ghFileSha) body.sha = ghFileSha;
+    // Save both files (only if there's data or existing file to update)
+    const saves = [];
+    if (hasFlora) saves.push(saveGHFile(GH_FILE_FLORA, outFlora, ghFileShaFlora).then(sha => { ghFileShaFlora = sha; }));
+    if (hasFauna) saves.push(saveGHFile(GH_FILE_FAUNA, outFauna, ghFileShaFauna).then(sha => { ghFileShaFauna = sha; }));
+    await Promise.all(saves);
 
-    const url = GH_API + '/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
-    const r = await fetch(url, {
-      method: 'PUT',
-      headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({}));
-      throw new Error(err.message || ('HTTP ' + r.status));
-    }
-    const result = await r.json();
-    ghFileSha = result.content.sha;
     updateGHStatus('saved');
     setTimeout(() => { if (!isSaving) updateGHStatus('connected'); }, 2000);
   } catch (err) {
@@ -681,7 +790,7 @@ function showTokenPrompt() {
     '   with "Contents: Read and write" permission\n\n' +
     'Current: ' + (ghToken ? ghToken.slice(0, 8) + '...' : '(none)')
   );
-  if (token === null) return; // cancelled
+  if (token === null) return;
   ghToken = token.trim();
   if (ghToken) {
     localStorage.setItem('gh-token', ghToken);
@@ -702,19 +811,67 @@ function escAttr(s) {
 }
 
 // ================================================================
-// INIT
+// INIT — load species from JSON files, then curated data from GitHub
 // ================================================================
 async function init() {
   curatedData = {};
-  ghFileSha = null;
+  ghFileShaFlora = null;
+  ghFileShaFauna = null;
+
+  // Load species data from JSON files
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch('species.json'),
+      fetch('species-insects.json')
+    ]);
+    const d1 = await r1.json();
+    const d2 = await r2.json();
+
+    GROUPS_FLORA = d1.groups || [];
+    GROUPS_FAUNA = d2.groups || [];
+
+    ALL_SPECIES = [];
+
+    // Flora species
+    for (const sp of (d1.species || [])) {
+      const grp = GROUPS_FLORA.find(g => g.id === sp.g);
+      ALL_SPECIES.push({
+        la: sp.la,
+        en: sp.en || sp.la,
+        groupId: sp.g,
+        groupName: grp ? grp.name : sp.g,
+        groupIcon: grp ? grp.icon : '',
+        domain: 'flora'
+      });
+    }
+
+    // Fauna species
+    for (const sp of (d2.species || [])) {
+      const grp = GROUPS_FAUNA.find(g => g.id === sp.g);
+      ALL_SPECIES.push({
+        la: sp.la,
+        en: sp.en || sp.la,
+        groupId: sp.g,
+        groupName: grp ? grp.name : sp.g,
+        groupIcon: grp ? grp.icon : '',
+        domain: 'fauna'
+      });
+    }
+  } catch (err) {
+    document.getElementById('main-status').textContent = 'Error loading species data: ' + err.message;
+    return;
+  }
+
+  // Load curated data from GitHub
   if (ghToken) {
     await loadFromGitHub();
   } else {
     updateGHStatus('disconnected');
   }
+
   renderSidebar();
+
   if (currentSpecies) {
-    // Restore selected images for current species from loaded data
     if (curatedData[currentSpecies]) {
       selectedImages = curatedData[currentSpecies].map(item => ({
         url: item.url,
@@ -725,6 +882,11 @@ async function init() {
       selectedImages = [];
     }
     renderContent();
+  } else {
+    document.getElementById('content').innerHTML =
+      '<select class="mobile-select" id="mobile-select" onchange="if(this.value)selectSpecies(this.value)"><option value="">Choose a species...</option></select>' +
+      '<div class="status">Select a species to begin curating images.</div>';
+    renderSidebar();
   }
 }
 init();
