@@ -430,5 +430,75 @@
       "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/20161027Ulmus_glabra1.jpg/500px-20161027Ulmus_glabra1.jpg",
       "label": "Leaves"
     }
+  ],
+  "Acer platanoides": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/20120821Acer_platanoides2.jpg/500px-20120821Acer_platanoides2.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/20150318Acer_platanoides1.jpg/500px-20150318Acer_platanoides1.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Acer_%C3%97_dieckii_Klon_Diecka_2020-08-07_04.jpg/500px-Acer_%C3%97_dieckii_Klon_Diecka_2020-08-07_04.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/20140204Acer_platanoides1.jpg/500px-20140204Acer_platanoides1.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/20140317Acer_platanoides2.jpg/500px-20140317Acer_platanoides2.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/20140317Acer_platanoides3.jpg/500px-20140317Acer_platanoides3.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Acer_platanoides_%2813923507126%29.jpg/500px-Acer_platanoides_%2813923507126%29.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Acer_platanoides_%2813923497831%29.jpg/500px-Acer_platanoides_%2813923497831%29.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Acer_platanoides_-_flowers.jpg/500px-Acer_platanoides_-_flowers.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Acer_platanoides_15-p.bot-a.platanoides-026.jpg/500px-Acer_platanoides_15-p.bot-a.platanoides-026.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/20120828Acer_platanoides2.jpg/500px-20120828Acer_platanoides2.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/20151214Acer_platanoides3.jpg/500px-20151214Acer_platanoides3.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Acer_platanoides_15-p.bot-a.platanoides-040.jpg/500px-Acer_platanoides_15-p.bot-a.platanoides-040.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Paprastasis_klevas_sparnavaisiai.JPG/500px-Paprastasis_klevas_sparnavaisiai.JPG",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Acer_platanoides_15-p.bot-a.platanoides-050.jpg/500px-Acer_platanoides_15-p.bot-a.platanoides-050.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Acer-platanoides-blade.JPG/500px-Acer-platanoides-blade.JPG",
+      "label": "Leaves"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Acer_platanoides_TK_2023-05-03_2.jpg/500px-Acer_platanoides_TK_2023-05-03_2.jpg",
+      "label": "Leaves"
+    }
   ]
 }
