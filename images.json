@@ -500,5 +500,79 @@
       "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Acer_platanoides_TK_2023-05-03_2.jpg/500px-Acer_platanoides_TK_2023-05-03_2.jpg",
       "label": "Leaves"
     }
+  ],
+  "Acer pseudoplatanus": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/Acer_pseudoplatanus%2801%29.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/14_08_jonho_6.jpg/500px-14_08_jonho_6.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Acer_pseudoplatanus_Klon_jawor_2020-08-15_%C5%81ysa_G%C3%B3ra_03.jpg/500px-Acer_pseudoplatanus_Klon_jawor_2020-08-15_%C5%81ysa_G%C3%B3ra_03.jpg",
+      "label": "Bark"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/20160117Acer_pseudoplatanus2.jpg/500px-20160117Acer_pseudoplatanus2.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/20191230Acer_pseudoplatanus1.jpg/500px-20191230Acer_pseudoplatanus1.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Acer_pseudoplatanus_buds2.jpg/500px-Acer_pseudoplatanus_buds2.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/20160118Acer_pseudoplatanus02.jpg/500px-20160118Acer_pseudoplatanus02.jpg",
+      "label": "Buds/Twigs"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/20150424Acer_pseudoplatanus3.jpg/500px-20150424Acer_pseudoplatanus3.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Acer_pseudoplatanus_120493895.jpg/500px-Acer_pseudoplatanus_120493895.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Acer_pseudoplatanus_Klon_jawor_2024-04-13_01.jpg/500px-Acer_pseudoplatanus_Klon_jawor_2024-04-13_01.jpg",
+      "label": "Flowers"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Acer.pseudoplatanus3.-.lindsey.jpg/500px-Acer.pseudoplatanus3.-.lindsey.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/20130702Ahorn_Saarbruecken3.jpg/500px-20130702Ahorn_Saarbruecken3.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/20160910Acer_pseudoplatanus2.jpg/500px-20160910Acer_pseudoplatanus2.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/20161023Acer_pseudoplatanus05.jpg/500px-20161023Acer_pseudoplatanus05.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/20161023Acer_pseudoplatanus07.jpg/500px-20161023Acer_pseudoplatanus07.jpg",
+      "label": "Fruit/Seeds"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Acer_pseudoplatanus_003.jpg/500px-Acer_pseudoplatanus_003.jpg",
+      "label": "Leaves"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/20170912Acer_pseudoplatanus1.jpg/500px-20170912Acer_pseudoplatanus1.jpg",
+      "label": "Leaves"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/%D0%AF%D0%B2%D0%BE%D1%80_-_%D0%BB%D0%B8%D1%81%D1%82_2.JPG/500px-%D0%AF%D0%B2%D0%BE%D1%80_-_%D0%BB%D0%B8%D1%81%D1%82_2.JPG",
+      "label": "Leaves"
+    }
   ]
 }
