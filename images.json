@@ -93,20 +93,28 @@
   ],
   "Betula pendula": [
     {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Birch_aa.jpg",
-      "label": "Whole tree"
-    },
-    {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Betula_aetnensis.jpg",
-      "label": "Whole tree"
-    },
-    {
-      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Angarsk%2C_Irkutsk_Oblast%2C_Russia_-_panoramio_%281%29.jpg/500px-Angarsk%2C_Irkutsk_Oblast%2C_Russia_-_panoramio_%281%29.jpg",
-      "label": "Whole tree"
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Beginn_der_D%C3%BCne_von_Dudenhofen.JPG/500px-Beginn_der_D%C3%BCne_von_Dudenhofen.JPG",
+      "label": "Whole plant"
     },
     {
       "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Alexandra_Lake_Wanstead_Flats_Redbridge_London_-_Silver_birch_01.jpg/500px-Alexandra_Lake_Wanstead_Flats_Redbridge_London_-_Silver_birch_01.jpg",
-      "label": "Whole tree"
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Alsdorf_-_Broichbachtal_-_Herbst.jpg/500px-Alsdorf_-_Broichbachtal_-_Herbst.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/A_birche_in_a_grove_in_the_peat_F%C3%B6chtelo%C3%ABrveen%2C_North-Netherlands%2C_spring_2012..jpg/500px-A_birche_in_a_grove_in_the_peat_F%C3%B6chtelo%C3%ABrveen%2C_North-Netherlands%2C_spring_2012..jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Ab_plant_607.jpg/500px-Ab_plant_607.jpg",
+      "label": "Whole plant"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Betula_forest.JPG/500px-Betula_forest.JPG",
+      "label": "Whole plant"
     }
   ],
   "Fraxinus excelsior": [
