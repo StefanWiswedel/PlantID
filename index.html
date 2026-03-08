@@ -249,6 +249,13 @@ img{display:block;max-width:100%}
 .leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .leaflet-popup-content{font-family:var(--fb);font-size:.82rem;margin:10px 14px}
 .leaflet-popup-content strong{font-weight:600}
+.map-pop{display:flex;gap:10px;align-items:flex-start;cursor:pointer;min-width:160px}
+.map-pop-thumb{width:52px;height:52px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#e8e6e0}
+.map-pop-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.map-pop-info{flex:1;min-width:0}
+.map-pop-info strong{display:block;margin-bottom:2px}
+.map-pop-info .pop-date{color:var(--tx2);font-size:.76rem}
+.map-pop-info .pop-note{font-style:italic;color:var(--tx2);font-size:.76rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 
 /* === LIGHTBOX === */
 .lb{position:fixed;inset:0;z-index:990;background:rgba(0,0,0,.96);display:none;flex-direction:column;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -919,7 +926,31 @@ function openMapModal() {
       const d=new Date(sg.date);
       const dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
       const m=L.marker([sg.lat,sg.lng]).addTo(fullMap);
-      m.bindPopup('<strong>'+(s?s.en:sg.id)+'</strong><br>'+dateStr+(sg.note?'<br><em>'+sg.note+'</em>':''));
+      const name=s?s.en:sg.id;
+      const thumbId='pop-thumb-'+sg.id+'-'+sg.date;
+      const popHtml='<div class="map-pop" data-sid="'+sg.id+'">' +
+        '<div class="map-pop-thumb" id="'+thumbId+'"></div>' +
+        '<div class="map-pop-info"><strong>'+name+'</strong>' +
+        '<div class="pop-date">'+dateStr+'</div>' +
+        (sg.note?'<div class="pop-note">'+sg.note+'</div>':'') +
+        '</div></div>';
+      const popup=L.popup({minWidth:180,maxWidth:260}).setContent(popHtml);
+      m.bindPopup(popup);
+      m.on('popupopen',()=>{
+        const el=document.getElementById(thumbId);
+        if(el&&!el.dataset.loaded&&s){
+          el.dataset.loaded='1';
+          fetchImgs(s.la).then(imgs=>{
+            if(imgs.length){const img=new Image();img.src=imgs[0].url;img.alt=s.en;el.appendChild(img);}
+            else{el.style.display='none';}
+          });
+        }
+        const popEl=el&&el.closest('.map-pop');
+        if(popEl&&!popEl.dataset.bound){
+          popEl.dataset.bound='1';
+          popEl.addEventListener('click',()=>{closeMapModal();openDet(sg.id);});
+        }
+      });
       bounds.push([sg.lat,sg.lng]);
     });
     if(bounds.length) fullMap.fitBounds(bounds,{padding:[50,50],maxZoom:14});
