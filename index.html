@@ -55,13 +55,18 @@ img{display:block;max-width:100%}
 .search-icon{position:absolute;left:34px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--tx3);pointer-events:none}
 .search-clear{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:24px;height:24px;display:none;align-items:center;justify-content:center;color:var(--tx3);border-radius:50%}
 .search-clear:active{background:rgba(0,0,0,.06)}
-.search-results{position:absolute;left:20px;right:20px;top:100%;z-index:100;background:var(--sf);border-radius:var(--rad);box-shadow:0 4px 20px rgba(0,0,0,.12);max-height:320px;overflow-y:auto;display:none}
-.search-results.on{display:block}
-.search-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:background .1s}
-.search-item:active,.search-item:hover{background:rgba(0,0,0,.03)}
-.search-item-name{font-size:.86rem;font-weight:500}
-.search-item-la{font-size:.74rem;color:var(--tx2);font-style:italic;font-weight:300}
-.search-item-grp{font-size:.62rem;color:var(--tx3);margin-left:auto;flex-shrink:0}
+.search-count{padding:10px 20px 0;font-size:.78rem;color:var(--tx2)}
+.search-count strong{color:var(--ac);font-weight:600}
+.pills.hidden{display:none}
+.sr-card{display:flex;gap:12px;padding:12px 20px;cursor:pointer;transition:background .1s;border-bottom:1px solid rgba(0,0,0,.04)}
+.sr-card:active{background:rgba(0,0,0,.03)}
+.sr-thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--sf)}
+.sr-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.sr-info{flex:1;min-width:0}
+.sr-name{font-size:.88rem;font-weight:600}
+.sr-la{font-size:.74rem;color:var(--tx2);font-style:italic}
+.sr-snippet{font-size:.76rem;color:var(--tx2);margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sr-snippet mark{background:rgba(45,106,79,.15);color:var(--ac);border-radius:2px;padding:0 1px;font-weight:600}
 
 /* Domain switcher */
 .domain-bar{display:flex;gap:0;margin:14px 20px 0;background:var(--sf);border-radius:var(--rad);padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
@@ -277,10 +282,10 @@ img{display:block;max-width:100%}
     <div class="domain-bar" id="domain-bar"><button class="domain-btn on" data-d="flora" onclick="setDomain('flora')"><span class="d-icon">🌿</span>Flora</button><button class="domain-btn" data-d="fauna" onclick="setDomain('fauna')"><span class="d-icon">🦋</span>Fauna</button></div>
     <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
-      <input type="text" class="search-input" id="search-input" placeholder="Search by name..." autocomplete="off">
+      <input type="text" class="search-input" id="search-input" placeholder="Search everything... e.g. 'pink buds' or 'toxic'" autocomplete="off">
       <button class="search-clear" id="search-clear" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
-      <div class="search-results" id="search-results"></div>
     </div>
+    <div class="search-count" id="search-count" style="display:none"></div>
     <div class="pills" id="pills"></div>
     <div class="grid" id="grid"><div class="loading"><div class="spinner"></div><p>Loading species...</p></div></div>
   </div>
@@ -627,44 +632,126 @@ function renderCardGrid(containerId, list) {
 }
 
 // ================================================================
-// SEARCH
+// FULL-TEXT SEARCH
 // ================================================================
+let searchIndex=new Map(); // id → {s: species, text: lowercased full text, raw: original text}
+let searchQ='';
+let searchTimer=null;
+
+function buildSearchIndex(speciesList){
+  for(const s of speciesList){
+    const parts=[s.la, s.en, s.da||'', s.hab||'', (s.feat||[]).join(' '), s.season||''];
+    if(s.conf) for(const c of s.conf) parts.push(c.sp||'', c.d||'');
+    if(s.filter&&s.filter.notable) parts.push(s.filter.notable.join(' '));
+    const raw=parts.join(' | ');
+    searchIndex.set(s.id, {s, text:raw.toLowerCase(), raw});
+  }
+}
+
+function searchSpecies(query){
+  const words=query.toLowerCase().split(/\s+/).filter(w=>w.length>0);
+  if(!words.length) return [];
+  const results=[];
+  for(const sp of SP){
+    const entry=searchIndex.get(sp.id);
+    if(!entry) continue;
+    if(words.every(w=>entry.text.includes(w))){
+      results.push({species:sp, raw:entry.raw, words});
+    }
+  }
+  return results;
+}
+
+function extractSnippet(raw, words){
+  // Split into fields and find the best one containing the most matched words
+  const fields=raw.split(' | ');
+  let bestField=fields[0], bestCount=0;
+  for(const f of fields){
+    const fl=f.toLowerCase();
+    const cnt=words.filter(w=>fl.includes(w)).length;
+    if(cnt>bestCount){bestCount=cnt;bestField=f;}
+  }
+  const lower=bestField.toLowerCase();
+  // Find position of first match in best field
+  let bestPos=bestField.length;
+  for(const w of words){const i=lower.indexOf(w);if(i>=0&&i<bestPos)bestPos=i;}
+  // Extract ~80 chars around first match
+  const start=Math.max(0,bestPos-20);
+  const end=Math.min(bestField.length,start+80);
+  let snip=bestField.slice(start,end).trim();
+  if(start>0) snip='…'+snip;
+  if(end<bestField.length) snip+='…';
+  // Highlight all matched words
+  for(const w of words){
+    const re=new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+    snip=snip.replace(re,'<mark>$1</mark>');
+  }
+  return snip;
+}
+
+function renderSearchResults(results, query){
+  const grid=document.getElementById('grid');
+  const countEl=document.getElementById('search-count');
+  const pills=document.getElementById('pills');
+
+  if(!results.length){
+    pills.classList.add('hidden');
+    countEl.style.display='block';
+    countEl.innerHTML='No results for <strong>\''+escH(query)+'\'</strong>';
+    grid.innerHTML='';
+    return;
+  }
+  pills.classList.add('hidden');
+  countEl.style.display='block';
+  countEl.innerHTML='<strong>'+results.length+'</strong> result'+(results.length===1?'':'s')+' for <strong>\''+escH(query)+'\'</strong>';
+  grid.innerHTML=results.map(r=>{
+    const s=r.species, snip=extractSnippet(r.raw, r.words);
+    return '<div class="sr-card" onclick="openDet(\''+s.id+'\')">'+
+      '<div class="sr-thumb" id="sri-'+s.id+'"></div>'+
+      '<div class="sr-info"><div class="sr-name">'+escH(s.en)+'</div><div class="sr-la">'+escH(s.la)+'</div>'+
+      '<div class="sr-snippet">'+snip+'</div></div></div>';
+  }).join('');
+  // Lazy load thumbnails
+  results.forEach(r=>{
+    const el=document.getElementById('sri-'+r.species.id);
+    if(el) fetchImgs(r.species.la).then(imgs=>{
+      if(imgs.length){const img=new Image();img.src=imgs[0].url;img.alt=r.species.en;el.appendChild(img);}
+    });
+  });
+}
+
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 (function(){
   const inp=document.getElementById('search-input');
-  const res=document.getElementById('search-results');
   const clr=document.getElementById('search-clear');
   inp.addEventListener('input',()=>{
-    const q=inp.value.trim().toLowerCase();
+    const q=inp.value.trim();
     clr.style.display=q?'flex':'none';
-    if(!q||q.length<1){res.classList.remove('on');return;}
-    const matches=SP.filter(s=>
-      s.en.toLowerCase().includes(q)||
-      s.la.toLowerCase().includes(q)||
-      (s.da&&s.da.toLowerCase().includes(q))
-    ).slice(0,12);
-    if(!matches.length){res.innerHTML='<div style="padding:14px 16px;color:var(--tx2);font-size:.84rem">No matches</div>';res.classList.add('on');return;}
-    res.innerHTML=matches.map(s=>{
-      const g=GRP.find(x=>x.id===s.g);
-      return '<div class="search-item" onmousedown="openDet(\''+s.id+'\');clearSearch()">'+
-        '<div><div class="search-item-name">'+highlight(s.en,q)+'</div><div class="search-item-la">'+highlight(s.la,q)+(s.da?' · '+highlight(s.da,q):'')+'</div></div>'+
-        (g?'<span class="search-item-grp">'+g.name+'</span>':'')+
-        '</div>';
-    }).join('');
-    res.classList.add('on');
+    clearTimeout(searchTimer);
+    if(!q){
+      searchQ='';
+      document.getElementById('search-count').style.display='none';
+      document.getElementById('pills').classList.remove('hidden');
+      renderGrid();
+      return;
+    }
+    searchTimer=setTimeout(()=>{
+      searchQ=q;
+      const results=searchSpecies(q);
+      renderSearchResults(results, q);
+    },150);
   });
-  inp.addEventListener('blur',()=>{setTimeout(()=>res.classList.remove('on'),200);});
-  inp.addEventListener('focus',()=>{if(inp.value.trim())inp.dispatchEvent(new Event('input'));});
 })();
-function highlight(text,q){
-  const i=text.toLowerCase().indexOf(q);
-  if(i<0)return text;
-  return text.slice(0,i)+'<mark style="background:var(--acl);color:var(--ac);border-radius:2px;padding:0 1px">'+text.slice(i,i+q.length)+'</mark>'+text.slice(i+q.length);
-}
 function clearSearch(){
   const inp=document.getElementById('search-input');
   inp.value='';
+  searchQ='';
+  clearTimeout(searchTimer);
   document.getElementById('search-clear').style.display='none';
-  document.getElementById('search-results').classList.remove('on');
+  document.getElementById('search-count').style.display='none';
+  document.getElementById('pills').classList.remove('hidden');
+  renderGrid();
 }
 
 // ================================================================
@@ -1204,6 +1291,9 @@ async function loadSpecies(){
     // Activate saved domain
     if(domain==='fauna'&&SP_FAUNA.length){SP=SP_FAUNA;GRP=GRP_FAUNA;}
     else{domain='flora';SP=SP_FLORA;GRP=GRP_FLORA;}
+    // Build search index for both domains
+    buildSearchIndex(SP_FLORA);
+    buildSearchIndex(SP_FAUNA);
     computeNotableTags();
     renderDomainBtns();
     updateBsub();
