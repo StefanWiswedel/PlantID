@@ -3508,6 +3508,52 @@
       }
     },
     {
+      "id": "chionodoxa-forbesii",
+      "la": "Chionodoxa forbesii",
+      "en": "Glory-of-the-snow",
+      "da": "Snestjerne",
+      "g": "bulb",
+      "ht": "10–20 cm",
+      "life": "perennial bulb",
+      "hab": "Parks, lawns, churchyards, grassy slopes, gardens. Widely planted and freely naturalising across Sjælland.",
+      "feat": [
+        "Star-shaped flowers with 6 tepals, pale blue, pink, or white with a lighter centre",
+        "6 erect stamens with broad flattened white filaments forming a distinctive central crown",
+        "Each stem carries 4–12 flowers in a one-sided raceme",
+        "Two narrow strap-shaped basal leaves per bulb",
+        "Naturalises freely on grassy slopes and lawns — forms expanding colonies"
+      ],
+      "season": "Flowers March–April, often in large drifts on park lawns. Dies back by late spring. One of the earliest and most cheerful spring bulbs.",
+      "conf": [
+        {
+          "sp": "Scilla bifolia (Alpine Squill)",
+          "d": "Alpine squill has narrower tepals, stamens with slender (not broad) filaments, and no pale centre to the flower. Rarer in Denmark."
+        },
+        {
+          "sp": "Muscari armeniacum (Grape Hyacinth)",
+          "d": "Grape hyacinth has urn-shaped (not star-shaped) flowers in a dense spike, and is a deeper blue-violet colour."
+        }
+      ],
+      "filter": {
+        "form": "bulb",
+        "habitat": [
+          "park",
+          "meadow"
+        ],
+        "leaf": "simple",
+        "leaf_arr": "basal",
+        "flower_color": "blue",
+        "bloom": [
+          "spring"
+        ],
+        "notable": [
+          "star-shaped flowers",
+          "broad stamens",
+          "naturalising"
+        ]
+      }
+    },
+    {
       "id": "hyacinthoides-non-scripta",
       "la": "Hyacinthoides non-scripta",
       "en": "Bluebell",
