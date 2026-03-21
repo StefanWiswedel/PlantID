@@ -469,7 +469,7 @@ async function fetchCatFiles(catTitle, limit) {
   return Object.values(d.query.pages).filter(p=>p.imageinfo&&p.imageinfo[0]&&p.imageinfo[0].thumburl).filter(p=>/\.(jpg|jpeg|png)$/i.test(p.title||'')).filter(p=>!SKIP_FILE.test(p.title||'')).map(p=>p.imageinfo[0].thumburl);
 }
 // Taxonomic synonyms: species whose Wikimedia Commons category uses a different name
-const WIKI_SYNONYMS = {'Chorthippus_parallelus':'Pseudochorthippus_parallelus'};
+const WIKI_SYNONYMS = {'Chorthippus_parallelus':'Pseudochorthippus_parallelus','Chionodoxa_forbesii':'Scilla_forbesii'};
 async function fetchImgs(la) {
   if (imgC[la]) return imgC[la];
   await curatedReady;
